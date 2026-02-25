@@ -7,31 +7,49 @@
 <style>
   body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; margin:0; padding:20px; background:#0f172a; color:#f1f5f9; }
   h1 { text-align:center; margin:6px 0 10px; }
-  .sub { text-align:center; opacity:.8; font-size:.95rem; margin-bottom:14px; }
+  .sub { text-align:center; opacity:.85; font-size:.95rem; margin-bottom:14px; }
 
-  .controls { text-align:center; margin-bottom:14px; }
+  .controls { text-align:center; margin-bottom:10px; }
   button { padding:8px 14px; margin:4px; border-radius:10px; border:none; cursor:pointer; background:#334155; color:#f1f5f9; }
   button.active { outline:2px solid #94a3b8; }
-  button:disabled { opacity:.5; cursor:not-allowed; }
 
-  .have { background:#16a34a; color:#fff; }
+  .have { background:#16a34a; }
   .limited { background:#eab308; color:#111827; }
-  .out { background:#dc2626; color:#fff; }
-  .stock { background:#0ea5e9; color:#0b1220; } /* In Stock button */
+  .out { background:#dc2626; }
+  .stock { background:#0ea5e9; color:#0b1220; }
+  .editToggle { background:#475569; }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
   .card { background:#1e293b; border-radius:14px; padding:12px; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.25); }
   .card img { width:100%; height:120px; object-fit:contain; margin-bottom:10px; background:#0b1220; border-radius:10px; }
 
-  .name { font-weight:800; font-size:1.05rem; line-height:1.15; }
+  .name { font-weight:800; font-size:1.05rem; display:flex; justify-content:center; align-items:center; gap:6px; }
   .name a { color:#f1f5f9; text-decoration:none; }
   .name a:hover { text-decoration:underline; }
 
-  .meta { opacity:.85; font-size:.85rem; margin-top:6px; line-height:1.2; }
-  .pillrow { margin-top:10px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .searchIcon {
+    font-size:0.9rem;
+    background:#0b1220;
+    padding:4px 6px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,.15);
+  }
 
-  .status { padding:4px 10px; border-radius:999px; font-size:.8rem; display:inline-block; }
-  .tag { padding:4px 10px; border-radius:999px; font-size:.78rem; display:inline-block; background:#0b1220; opacity:.95; }
+  .meta { opacity:.85; font-size:.85rem; margin-top:6px; }
+  .pillrow { margin-top:10px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+  .status { padding:4px 10px; border-radius:999px; font-size:.8rem; }
+  .tag { padding:4px 10px; border-radius:999px; font-size:.75rem; background:#0b1220; }
+
+  .editor { margin-top:10px; display:none; gap:6px; justify-content:center; flex-wrap:wrap; }
+  .editor.show { display:flex; }
+
+  .miniBtn {
+    padding:5px 10px;
+    border-radius:999px;
+    font-size:.75rem;
+    border:none;
+    cursor:pointer;
+  }
 
   .footer { text-align:center; opacity:.7; font-size:.82rem; margin-top:16px; }
 </style>
@@ -42,191 +60,136 @@
   <div class="sub" id="subtitle">Loading…</div>
 
   <div class="controls">
-    <button id="btn-stock" class="stock" onclick="setFilter('stock')">In Stock</button>
-    <button id="btn-have" class="have" onclick="setFilter('have')">Have</button>
-    <button id="btn-limited" class="limited" onclick="setFilter('limited')">Limited</button>
-    <button id="btn-out" class="out" onclick="setFilter('out')">Out</button>
-    <button id="btn-all" onclick="setFilter('all')">All</button>
+    <button class="stock" onclick="setFilter('stock')">In Stock</button>
+    <button class="have" onclick="setFilter('have')">Have</button>
+    <button class="limited" onclick="setFilter('limited')">Limited</button>
+    <button class="out" onclick="setFilter('out')">Out</button>
+    <button onclick="setFilter('all')">All</button>
+  </div>
+
+  <div class="controls">
+    <button id="editToggle" class="editToggle" onclick="toggleEdit()">Fridge status wrong?</button>
   </div>
 
   <div class="grid" id="grid"></div>
   <div class="footer" id="updated"></div>
 
 <script>
-  // ====== CONFIG ======
-  const SHEET_CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzb-W4uPTyGJPj9aZez-MkWa923Ktrs6CDZnlN9VyuRPaYijJhLyPU8xVllMojrzY-iOx0gj5A9nFI/pub?output=csv&gid=0";
+const SHEET_CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQzb-W4uPTyGJPj9aZez-MkWa923Ktrs6CDZnlN9VyuRPaYijJhLyPU8xVllMojrzY-iOx0gj5A9nFI/pub?output=csv&gid=0";
 
-  const REFRESH_SECONDS = 60;
+const UPDATE_ENDPOINT_URL =
+"https://script.google.com/macros/s/AKfycbzDRHY4QHV2Ab1G_8JjvOJ2cTa0HVOgcgexWr6Ly-WGzpTaGU6tE-62OsM-RzBx3bZfHQ/exec";
 
-  // default view: Have + Limited
-  let currentFilter = 'stock';
-  // ====================
+// MUST match Apps Script TOKEN
+const UPDATE_TOKEN = "bfridge-7Hn93kLq2pXz-2026";
 
-  let drinks = [];
+let drinks = [];
+let filter = "stock";
+let editMode = false;
 
-  function normalizeStatus(s) {
-    const v = String(s || '').trim().toLowerCase();
-    if (v === 'have' || v === 'limited' || v === 'out') return v;
-    return 'limited'; // safe default if data is messy
-  }
+function toggleEdit() {
+  editMode = !editMode;
+  render();
+}
 
-  function setActiveButton(filter) {
-    ['stock','have','limited','out','all'].forEach(f => {
-      const el = document.getElementById(`btn-${f}`);
-      if (!el) return;
-      el.classList.toggle('active', f === filter);
-    });
-  }
+function setFilter(f) {
+  filter = f;
+  render();
+}
 
-  function setFilter(filter) {
-    currentFilter = filter;
-    setActiveButton(filter);
-    render(getFiltered());
-  }
+function normalizeStatus(s) {
+  s = String(s || "").toLowerCase().trim();
+  return ["have","limited","out"].includes(s) ? s : "limited";
+}
 
-  function getFiltered() {
-    if (currentFilter === 'all') return drinks;
-    if (currentFilter === 'stock') return drinks.filter(d => d.status === 'have' || d.status === 'limited');
-    return drinks.filter(d => d.status === currentFilter);
-  }
-
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, m => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[m]));
-  }
-
-  // Minimal CSV parser (handles quotes)
-  function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let cell = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < text.length; i++) {
-      const c = text[i];
-      const next = text[i+1];
-
-      if (c === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
-      if (c === '"') { inQuotes = !inQuotes; continue; }
-
-      if (!inQuotes && c === ',') { row.push(cell); cell = ''; continue; }
-      if (!inQuotes && (c === '\n' || c === '\r')) {
-        if (c === '\r' && next === '\n') i++;
-        row.push(cell);
-        rows.push(row);
-        row = [];
-        cell = '';
-        continue;
-      }
-      cell += c;
-    }
-    if (cell.length || row.length) { row.push(cell); rows.push(row); }
-    return rows;
-  }
-
-  function rowsToObjects(rows) {
-    if (!rows.length) return [];
-    const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
-
-    return rows.slice(1)
-      .filter(r => r.some(v => String(v || '').trim() !== ''))
-      .map(r => {
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = (r[i] ?? '').trim());
-        obj.status = normalizeStatus(obj.status);
-        return obj;
-      });
-  }
-
-  function buildGoogleSearchUrl(name, category) {
-    const q = encodeURIComponent(`${name || ''} ${category || ''}`.trim());
-    return `https://www.google.com/search?q=${q}`;
-  }
-
-  function render(list) {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
-
-    list.forEach(d => {
-      const status = normalizeStatus(d.status);
-      const image = String(d.image || '').trim();
-      const name = String(d.name || '').trim();
-      const brand = String(d.brand || '').trim();
-      const category = String(d.category || '').trim();
-      const pkg = String(d.package || '').trim(); // Can / Mini Can / Bottle
-
-      const searchUrl = buildGoogleSearchUrl(name, category);
-
-      const metaParts = [];
-      if (brand) metaParts.push(brand);
-      if (category) metaParts.push(category);
-
-      const card = document.createElement('div');
-      card.className = 'card';
-
-      card.innerHTML = `
-        ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(name)}">` : ''}
-        <div class="name">
-          <a href="${searchUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>
-        </div>
-        <div class="meta">${escapeHtml(metaParts.join(' • '))}</div>
-
-        <div class="pillrow">
-          <span class="status ${status}">${status.toUpperCase()}</span>
-          ${pkg ? `<span class="tag">${escapeHtml(pkg)}</span>` : ''}
-        </div>
-      `;
-
-      grid.appendChild(card);
-    });
-  }
-
-  async function load() {
-    document.getElementById('subtitle').textContent = 'Loading…';
-
-    // cache-buster helps freshness
-    const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + '_=' + Date.now();
-    const res = await fetch(url, { cache: 'no-store' });
-    const csvText = await res.text();
-
-    const rows = parseCSV(csvText);
-    drinks = rowsToObjects(rows);
-
-    const have = drinks.filter(d => d.status === 'have').length;
-    const limited = drinks.filter(d => d.status === 'limited').length;
-    const out = drinks.filter(d => d.status === 'out').length;
-
-    document.getElementById('subtitle').textContent = `${have} have • ${limited} limited • ${out} out`;
-    document.getElementById('updated').textContent = `Last refreshed: ${new Date().toLocaleString()}`;
-
-    // Hide Out button unless there's at least one Out item
-    const outBtn = document.getElementById('btn-out');
-    if (out === 0) {
-      outBtn.style.display = 'none';
-      if (currentFilter === 'out') currentFilter = 'stock';
-    } else {
-      outBtn.style.display = 'inline-block';
-    }
-
-    // Default: show Have + Limited (stock)
-    setActiveButton(currentFilter);
-    render(getFiltered());
-  }
-
-  // Initialize default filter
-  setFilter('stock');
-
-  load().catch(err => {
-    console.error(err);
-    document.getElementById('subtitle').textContent =
-      'Failed to load sheet. Confirm Published to web is enabled and the gid is correct.';
+function parseCSV(text) {
+  const rows = text.trim().split("\n").map(r => r.split(","));
+  const headers = rows[0].map(h => h.toLowerCase());
+  return rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = (r[i] || "").trim());
+    obj.status = normalizeStatus(obj.status);
+    return obj;
   });
+}
 
-  if (REFRESH_SECONDS > 0) {
-    setInterval(() => load().catch(console.error), REFRESH_SECONDS * 1000);
-  }
+function buildSearch(name, category) {
+  return "https://www.google.com/search?q=" +
+    encodeURIComponent(name + " " + category);
+}
+
+async function updateStatus(key, status) {
+  await fetch(UPDATE_ENDPOINT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token: UPDATE_TOKEN,
+      key: key,
+      status: status
+    })
+  });
+}
+
+function getFiltered() {
+  if (filter === "all") return drinks;
+  if (filter === "stock") return drinks.filter(d => d.status !== "out");
+  return drinks.filter(d => d.status === filter);
+}
+
+function render() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  getFiltered().forEach(d => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const searchUrl = buildSearch(d.name, d.category);
+
+    card.innerHTML = `
+      ${d.image ? `<img src="${d.image}" alt="${d.name}">` : ""}
+      <div class="name">
+        <a href="${searchUrl}" target="_blank">${d.name}</a>
+        <a class="searchIcon" href="${searchUrl}" target="_blank">🔍</a>
+      </div>
+      <div class="meta">${d.brand} • ${d.category}</div>
+      <div class="pillrow">
+        <span class="status ${d.status}">${d.status.toUpperCase()}</span>
+        ${d.package ? `<span class="tag">${d.package}</span>` : ""}
+      </div>
+      <div class="editor ${editMode ? "show" : ""}">
+        <button class="miniBtn have" onclick="changeStatus('${d.key}','have')">Have</button>
+        <button class="miniBtn limited" onclick="changeStatus('${d.key}','limited')">Limited</button>
+        <button class="miniBtn out" onclick="changeStatus('${d.key}','out')">Out</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+async function changeStatus(key, status) {
+  const item = drinks.find(d => d.key === key);
+  if (!item) return;
+
+  item.status = status;
+  render();
+  await updateStatus(key, status);
+  setTimeout(load, 1500);
+}
+
+async function load() {
+  const res = await fetch(SHEET_CSV_URL + "&_=" + Date.now());
+  const text = await res.text();
+  drinks = parseCSV(text);
+  render();
+  document.getElementById("updated").textContent =
+    "Last refreshed: " + new Date().toLocaleString();
+}
+
+load();
+setInterval(load, 60000);
 </script>
 </body>
 </html>
