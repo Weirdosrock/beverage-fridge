@@ -6,514 +6,776 @@
 <title>Beverage Fridge</title>
 
 <style>
-body {
-  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-  background:#0f172a;
-  color:#f1f5f9;
-  padding:20px;
-  margin:0;
-}
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#0f172a;
+    color:#f1f5f9;
+    padding:20px;
+    margin:0;
+  }
 
-h1 { text-align:center; margin-bottom:14px; }
+  h1 { text-align:center; margin:0 0 12px; }
 
-.topActions {
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  margin-bottom:14px;
-}
+  .sub {
+    text-align:center;
+    opacity:.75;
+    font-size:.92rem;
+    margin-bottom:14px;
+  }
 
-.actionBtn {
-  padding:8px 12px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.14);
-  background:#1e293b;
-  color:#f1f5f9;
-  cursor:pointer;
-  font-size:.9rem;
-}
-.actionBtn:hover { border-color: rgba(255,255,255,.30); }
+  .topActions {
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
 
-.panel {
-  max-width:820px;
-  margin:0 auto 14px;
-  background:#111c33;
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:14px;
-  padding:12px;
-  display:none;
-}
-.panel.show { display:block; }
+  .actionBtn {
+    padding:8px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.14);
+    background:#1e293b;
+    color:#f1f5f9;
+    cursor:pointer;
+    font-size:.9rem;
+  }
+  .actionBtn:hover { border-color: rgba(255,255,255,.30); }
+  .actionBtn:disabled { opacity:.55; cursor:not-allowed; }
 
-.panelTitle {
-  font-weight:700;
-  margin:2px 0 10px;
-  opacity:.95;
-}
+  .panel {
+    max-width:820px;
+    margin:0 auto 14px;
+    background:#111c33;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    padding:12px;
+    display:none;
+  }
+  .panel.show { display:block; }
+  .panelTitle { font-weight:700; margin:2px 0 10px; opacity:.95; }
 
-.formRow {
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-}
-@media (max-width: 700px) { .formRow { grid-template-columns: 1fr; } }
+  .formRow {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width: 700px) { .formRow { grid-template-columns: 1fr; } }
 
-label { font-size:.8rem; opacity:.8; display:block; margin-bottom:6px; }
-input, select, textarea {
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.14);
-  background:#0b1220;
-  color:#f1f5f9;
-  outline:none;
-}
-textarea { min-height:80px; resize:vertical; }
+  label { font-size:.8rem; opacity:.8; display:block; margin-bottom:6px; }
+  input, select, textarea {
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.14);
+    background:#0b1220;
+    color:#f1f5f9;
+    outline:none;
+  }
+  textarea { min-height:80px; resize:vertical; }
 
-.panelActions {
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-  margin-top:10px;
-  flex-wrap:wrap;
-}
-.primary {
-  background:#0ea5e9;
-  color:#0b1220;
-  border-color: transparent;
-}
-.danger {
-  background:#475569;
-  border-color: transparent;
-}
+  .panelActions {
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
 
-.notice {
-  font-size:.82rem;
-  opacity:.75;
-  margin-top:8px;
-}
+  .primary {
+    background:#0ea5e9;
+    color:#0b1220;
+    border-color: transparent;
+  }
+  .danger {
+    background:#475569;
+    border-color: transparent;
+  }
 
-.grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-  gap:16px;
-}
+  .notice {
+    font-size:.82rem;
+    opacity:.75;
+    margin-top:8px;
+  }
 
-.card {
-  background:#1e293b;
-  padding:14px;
-  border-radius:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,.3);
-}
+  .controlsWrap {
+    max-width:980px;
+    margin:0 auto 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
 
-.card img {
-  width:100%;
-  height:120px;
-  object-fit:contain;
-  background:#0b1220;
-  border-radius:10px;
-  margin-bottom:10px;
-}
+  .rowControls {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+  }
 
-/* readable links */
-.name {
-  font-weight:700;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-}
-.name a { color:inherit; text-decoration:none; }
-.name a:visited { color:inherit; }
-.name a:hover { text-decoration:underline; opacity:.9; }
+  .chip {
+    padding:7px 11px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    background:#1e293b;
+    color:#f1f5f9;
+    cursor:pointer;
+    font-size:.85rem;
+    user-select:none;
+  }
+  .chip:hover { border-color: rgba(255,255,255,.30); }
+  .chip.active { outline:2px solid rgba(203,213,225,.9); }
 
-.searchIcon {
-  font-size:.9rem;
-  background:#0b1220;
-  padding:4px 6px;
-  border-radius:6px;
-  border:1px solid rgba(255,255,255,.15);
-  color:#cbd5e1;
-  text-decoration:none;
-}
-.searchIcon:hover { background:#1e293b; border-color:rgba(255,255,255,.35); }
+  .chip.have { background:#16a34a; border-color:transparent; }
+  .chip.limited { background:#eab308; color:#111827; border-color:transparent; }
+  .chip.out { background:#dc2626; border-color:transparent; }
+  .chip.stock { background:#0ea5e9; color:#0b1220; border-color:transparent; }
 
-.meta {
-  font-size:.85rem;
-  opacity:.85;
-  text-align:center;
-  margin-top:6px;
-}
+  .chip.small { font-size:.78rem; padding:6px 10px; background:#0b1220; }
 
-.pillrow {
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  margin-top:8px;
-}
+  .grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:16px;
+    max-width:1100px;
+    margin:0 auto;
+  }
 
-.status {
-  padding:4px 10px;
-  border-radius:999px;
-  font-size:.8rem;
-}
+  .card {
+    background:#1e293b;
+    padding:14px;
+    border-radius:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);
+  }
 
-.have { background:#16a34a; }
-.limited { background:#eab308; color:#111827; }
-.out { background:#dc2626; }
+  .card img {
+    width:100%;
+    height:120px;
+    object-fit:contain;
+    background:#0b1220;
+    border-radius:10px;
+    margin-bottom:10px;
+  }
 
-.tag {
-  padding:4px 10px;
-  border-radius:999px;
-  background:#0b1220;
-  font-size:.75rem;
-}
+  .name {
+    font-weight:750;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    text-align:center;
+  }
+  .name a { color:inherit; text-decoration:none; }
+  .name a:visited { color:inherit; }
+  .name a:hover { text-decoration:underline; opacity:.9; }
 
-.miniLink {
-  display:block;
-  text-align:center;
-  font-size:.75rem;
-  margin-top:10px;
-  opacity:.6;
-  cursor:pointer;
-}
-.miniLink:hover { opacity:.9; }
+  .searchIcon {
+    font-size:.9rem;
+    background:#0b1220;
+    padding:4px 6px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,.15);
+    color:#cbd5e1;
+    text-decoration:none;
+  }
+  .searchIcon:hover { background:#1e293b; border-color:rgba(255,255,255,.35); }
 
-.editor {
-  display:none;
-  margin-top:8px;
-  text-align:center;
-}
-.editor button {
-  margin:4px;
-  padding:6px 10px;
-  border:none;
-  border-radius:999px;
-  font-size:.75rem;
-  cursor:pointer;
-  color:white;
-}
+  .meta {
+    font-size:.85rem;
+    opacity:.85;
+    text-align:center;
+    margin-top:6px;
+  }
 
-.footer {
-  text-align:center;
-  margin-top:20px;
-  font-size:.8rem;
-  opacity:.6;
-}
+  .pillrow {
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+
+  .status {
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:.8rem;
+  }
+
+  .haveBadge { background:#16a34a; }
+  .limitedBadge { background:#eab308; color:#111827; }
+  .outBadge { background:#dc2626; }
+
+  .tagPill {
+    padding:4px 10px;
+    border-radius:999px;
+    background:#0b1220;
+    font-size:.75rem;
+    opacity:.95;
+  }
+
+  .miniLink {
+    display:block;
+    text-align:center;
+    font-size:.75rem;
+    margin-top:10px;
+    opacity:.62;
+    cursor:pointer;
+  }
+  .miniLink:hover { opacity:.92; }
+
+  .editor {
+    display:none;
+    margin-top:8px;
+    text-align:center;
+  }
+  .editor button {
+    margin:4px;
+    padding:6px 10px;
+    border:none;
+    border-radius:999px;
+    font-size:.75rem;
+    cursor:pointer;
+    color:white;
+  }
+
+  .footer {
+    text-align:center;
+    margin-top:20px;
+    font-size:.8rem;
+    opacity:.6;
+  }
 </style>
 </head>
 
 <body>
+  <h1>Beverage Fridge</h1>
+  <div class="sub" id="subtitle">Loading…</div>
 
-<h1>Beverage Fridge</h1>
+  <div class="topActions">
+    <button class="actionBtn" onclick="togglePanel('quickAddPanel')">➕ Quick Add</button>
+    <button class="actionBtn" onclick="togglePanel('requestPanel')">📝 Request</button>
+  </div>
 
-<div class="topActions">
-  <button class="actionBtn" id="btnQuickAdd" onclick="togglePanel('quickAddPanel')">➕ Quick Add</button>
-  <button class="actionBtn" id="btnRequest" onclick="togglePanel('requestPanel')">📝 Request</button>
-</div>
+  <!-- Quick Add Panel -->
+  <div class="panel" id="quickAddPanel">
+    <div class="panelTitle">Quick Add</div>
 
-<!-- Quick Add Panel (hidden by default) -->
-<div class="panel" id="quickAddPanel">
-  <div class="panelTitle">Quick Add</div>
+    <div class="formRow">
+      <div>
+        <label>Name (required)</label>
+        <input id="qa_name" placeholder="e.g., Diet Coke Cherry" />
+      </div>
+      <div>
+        <label>Brand</label>
+        <input id="qa_brand" placeholder="e.g., Coca-Cola" />
+      </div>
 
-  <div class="formRow">
-    <div>
-      <label>Name (required)</label>
-      <input id="qa_name" placeholder="e.g., Diet Coke Cherry" />
+      <div>
+        <label>Category</label>
+        <input id="qa_category" placeholder="e.g., Soda" />
+      </div>
+      <div>
+        <label>Package</label>
+        <select id="qa_package">
+          <option value="">(optional)</option>
+          <option>Can</option>
+          <option>Mini Can</option>
+          <option>Bottle</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Status</label>
+        <select id="qa_status">
+          <option>have</option>
+          <option>limited</option>
+          <option>out</option>
+        </select>
+      </div>
+      <div>
+        <label>Image path (optional)</label>
+        <input id="qa_image" placeholder="image/newdrink.jpeg" />
+      </div>
+
+      <div style="grid-column:1 / -1;">
+        <label>Tags (multi-select)</label>
+        <div class="rowControls" id="qa_tags"></div>
+        <div class="notice">Tip: choose one from caffeine + alcohol + sweetness. (Carbonated is optional.)</div>
+      </div>
     </div>
-    <div>
-      <label>Brand</label>
-      <input id="qa_brand" placeholder="e.g., Coca-Cola" />
-    </div>
 
-    <div>
-      <label>Category</label>
-      <input id="qa_category" placeholder="e.g., Soda" />
-    </div>
-    <div>
-      <label>Package</label>
-      <select id="qa_package">
-        <option value="">(optional)</option>
-        <option>Can</option>
-        <option>Mini Can</option>
-        <option>Bottle</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Status</label>
-      <select id="qa_status">
-        <option>have</option>
-        <option>limited</option>
-        <option>out</option>
-      </select>
-    </div>
-    <div>
-      <label>Image path (optional)</label>
-      <input id="qa_image" placeholder="image/newdrink.jpeg" />
+    <div class="panelActions">
+      <button class="actionBtn danger" onclick="clearQuickAdd()">Clear</button>
+      <button class="actionBtn primary" id="qa_submit" onclick="submitQuickAdd()">Add to Sheet</button>
     </div>
   </div>
 
-  <div class="panelActions">
-    <button class="actionBtn danger" onclick="clearQuickAdd()">Clear</button>
-    <button class="actionBtn primary" onclick="submitQuickAdd()">Add to Sheet</button>
+  <!-- Request Panel -->
+  <div class="panel" id="requestPanel">
+    <div class="panelTitle">Request a drink</div>
+
+    <div class="formRow">
+      <div>
+        <label>Request (required)</label>
+        <input id="rq_request" placeholder="e.g., Poppi Grape" />
+      </div>
+      <div>
+        <label>Requested by</label>
+        <input id="rq_by" placeholder="e.g., Leon / Erin / Kids" />
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <label>Notes</label>
+        <textarea id="rq_notes" placeholder="Any notes (flavor, brand, where to buy, etc.)"></textarea>
+      </div>
+    </div>
+
+    <div class="panelActions">
+      <button class="actionBtn danger" onclick="clearRequest()">Clear</button>
+      <button class="actionBtn primary" id="rq_submit" onclick="submitRequest()">Send Request</button>
+    </div>
+
+    <div class="notice">Requests go to a “Requests” tab in the same spreadsheet (auto-created if missing).</div>
   </div>
 
-  <div class="notice">Tip: leave image blank if you haven’t uploaded it yet—add it later in GitHub and update the sheet when convenient.</div>
-</div>
-
-<!-- Request Panel (hidden by default) -->
-<div class="panel" id="requestPanel">
-  <div class="panelTitle">Request a drink</div>
-
-  <div class="formRow">
-    <div>
-      <label>Request (required)</label>
-      <input id="rq_request" placeholder="e.g., Poppi Grape" />
-    </div>
-    <div>
-      <label>Requested by</label>
-      <input id="rq_by" placeholder="e.g., Leon / Erin / Kids" />
-    </div>
-    <div style="grid-column: 1 / -1;">
-      <label>Notes</label>
-      <textarea id="rq_notes" placeholder="Any notes (flavor, brand, size, where to buy, etc.)"></textarea>
-    </div>
+  <!-- Filters -->
+  <div class="controlsWrap">
+    <div class="rowControls" id="statusFilters"></div>
+    <div class="rowControls" id="tagFilters"></div>
   </div>
 
-  <div class="panelActions">
-    <button class="actionBtn danger" onclick="clearRequest()">Clear</button>
-    <button class="actionBtn primary" onclick="submitRequest()">Send Request</button>
-  </div>
-
-  <div class="notice">Requests go into a “Requests” tab in the same spreadsheet (auto-created if missing).</div>
-</div>
-
-<div class="grid" id="grid"></div>
-<div class="footer" id="updated"></div>
+  <div class="grid" id="grid"></div>
+  <div class="footer" id="updated"></div>
 
 <script>
-const SHEET_CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vQzb-W4uPTyGJPj9aZez-MkWa923Ktrs6CDZnlN9VyuRPaYijJhLyPU8xVllMojrzY-iOx0gj5A9nFI/pub?output=csv&gid=0";
+  // ====== CONFIG ======
+  const SHEET_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzb-W4uPTyGJPj9aZez-MkWa923Ktrs6CDZnlN9VyuRPaYijJhLyPU8xVllMojrzY-iOx0gj5A9nFI/pub?output=csv&gid=0";
 
-const UPDATE_ENDPOINT_URL =
-"https://script.google.com/macros/s/AKfycbzDRHY4QHV2Ab1G_8JjvOJ2cTa0HVOgcgexWr6Ly-WGzpTaGU6tE-62OsM-RzBx3bZfHQ/exec";
+  const UPDATE_ENDPOINT_URL =
+    "https://script.google.com/macros/s/AKfycbzDRHY4QHV2Ab1G_8JjvOJ2cTa0HVOgcgexWr6Ly-WGzpTaGU6tE-62OsM-RzBx3bZfHQ/exec";
 
-// MUST match Apps Script TOKEN
-const UPDATE_TOKEN = "bfridge-7Hn93kLq2pXz-2026";
+  // MUST match Apps Script TOKEN
+  const UPDATE_TOKEN = "bfridge-7Hn93kLq2pXz-2026";
 
-let drinks = [];
+  const REFRESH_SECONDS = 60;
 
-function normalizeStatus(s) {
-  s = String(s || "").toLowerCase().trim();
-  return ["have","limited","out"].includes(s) ? s : "limited";
-}
+  // Tag vocabulary (core + sweetness)
+  const TAG_VOCAB = [
+    "caffeinated",
+    "caffeine-free",
+    "alcoholic",
+    "non-alcoholic",
+    "carbonated",
+    "full-sugar",
+    "diet",
+    "low-sugar",
+    "unsweetened"
+  ];
+  // ====================
 
-/* Robust CSV parser */
-function parseCSV(text) {
-  const rows = [];
-  let row = [];
-  let cell = '';
-  let inQuotes = false;
+  let drinks = [];
+  let statusFilter = "stock"; // stock = have + limited
+  const selectedTags = new Set(); // multi-select AND
+  const selectedQuickAddTags = new Set();
 
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    const next = text[i+1];
+  function normalizeStatus(s) {
+    const v = String(s || "").trim().toLowerCase();
+    return (v === "have" || v === "limited" || v === "out") ? v : "limited";
+  }
 
-    if (c === '"' && inQuotes && next === '"') {
-      cell += '"';
-      i++;
-      continue;
-    }
-    if (c === '"') {
-      inQuotes = !inQuotes;
-      continue;
-    }
-    if (c === ',' && !inQuotes) {
-      row.push(cell);
-      cell = '';
-      continue;
-    }
-    if ((c === '\n' || c === '\r') && !inQuotes) {
-      if (cell || row.length) {
+  function normalizeTagsStr(s) {
+    return String(s || "")
+      .split(",")
+      .map(x => x.trim().toLowerCase())
+      .filter(Boolean);
+  }
+
+  // Robust CSV parser (handles quotes/commas)
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let cell = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      const next = text[i + 1];
+
+      if (c === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
+      if (c === '"') { inQuotes = !inQuotes; continue; }
+
+      if (!inQuotes && c === ',') { row.push(cell); cell = ''; continue; }
+
+      if (!inQuotes && (c === '\n' || c === '\r')) {
+        if (c === '\r' && next === '\n') i++;
         row.push(cell);
         rows.push(row);
         row = [];
         cell = '';
+        continue;
       }
-      continue;
+
+      cell += c;
     }
-    cell += c;
-  }
-  if (cell) {
-    row.push(cell);
-    rows.push(row);
+    if (cell.length || row.length) { row.push(cell); rows.push(row); }
+
+    const headers = (rows[0] || []).map(h => String(h || "").trim().toLowerCase());
+
+    return rows.slice(1)
+      .filter(r => r.some(v => String(v || "").trim() !== ""))
+      .map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+
+        obj.status = normalizeStatus(obj.status);
+        obj.key = String(obj.key || "").trim().toLowerCase();
+        obj.tags_list = normalizeTagsStr(obj.tags);
+
+        return obj;
+      });
   }
 
-  const headers = rows[0].map(h => h.toLowerCase());
-  return rows.slice(1)
-    .filter(r => r.some(v => String(v || "").trim() !== ""))
-    .map(r => {
-      const obj = {};
-      headers.forEach((h,i) => obj[h] = (r[i] || "").trim());
-      obj.status = normalizeStatus(obj.status);
-      obj.key = String(obj.key || "").trim().toLowerCase();
-      return obj;
+  function buildGoogleSearchUrl(name, category) {
+    const q = encodeURIComponent(`${name || ""} ${category || ""}`.trim());
+    return `https://www.google.com/search?q=${q}`;
+  }
+
+  function withCacheBuster(url) {
+    return url + (url.includes("?") ? "&" : "?") + "_=" + Date.now();
+  }
+
+  async function fetchCsv(url) {
+    const res = await fetch(withCacheBuster(url), { cache: "no-store" });
+    return await res.text();
+  }
+
+  async function postAction(payload) {
+    await fetch(UPDATE_ENDPOINT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-}
+  }
 
-function buildSearch(name, category) {
-  return "https://www.google.com/search?q=" +
-    encodeURIComponent((name || "") + " " + (category || ""));
-}
+  function togglePanel(id) {
+    document.getElementById(id).classList.toggle("show");
+  }
 
-async function postAction(payload) {
-  // no-cors keeps browser from blocking cross-origin POST to Apps Script
-  await fetch(UPDATE_ENDPOINT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+  // --- Filters UI ---
+  function buildStatusFilters() {
+    const wrap = document.getElementById("statusFilters");
+    wrap.innerHTML = "";
+
+    const defs = [
+      { id: "stock", label: "In Stock", cls: "chip stock" },
+      { id: "have", label: "Have", cls: "chip have" },
+      { id: "limited", label: "Limited", cls: "chip limited" },
+      { id: "out", label: "Out", cls: "chip out" },
+      { id: "all", label: "All", cls: "chip" }
+    ];
+
+    defs.forEach(d => {
+      const btn = document.createElement("div");
+      btn.className = d.cls + (statusFilter === d.id ? " active" : "");
+      btn.textContent = d.label;
+      btn.onclick = () => {
+        statusFilter = d.id;
+        buildStatusFilters();
+        render();
+      };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function buildTagFilters() {
+    const wrap = document.getElementById("tagFilters");
+    wrap.innerHTML = "";
+
+    TAG_VOCAB.forEach(tag => {
+      const btn = document.createElement("div");
+      btn.className = "chip small" + (selectedTags.has(tag) ? " active" : "");
+      btn.textContent = tag;
+      btn.onclick = () => {
+        if (selectedTags.has(tag)) selectedTags.delete(tag);
+        else selectedTags.add(tag);
+        buildTagFilters();
+        render();
+      };
+      wrap.appendChild(btn);
+    });
+
+    // Clear button only when something is selected
+    if (selectedTags.size > 0) {
+      const clear = document.createElement("div");
+      clear.className = "chip small";
+      clear.textContent = "clear tags";
+      clear.onclick = () => {
+        selectedTags.clear();
+        buildTagFilters();
+        render();
+      };
+      wrap.appendChild(clear);
+    }
+  }
+
+  // --- Quick Add tags UI ---
+  function buildQuickAddTags() {
+    const wrap = document.getElementById("qa_tags");
+    wrap.innerHTML = "";
+
+    TAG_VOCAB.forEach(tag => {
+      const btn = document.createElement("div");
+      btn.className = "chip small" + (selectedQuickAddTags.has(tag) ? " active" : "");
+      btn.textContent = tag;
+      btn.onclick = () => {
+        if (selectedQuickAddTags.has(tag)) selectedQuickAddTags.delete(tag);
+        else selectedQuickAddTags.add(tag);
+        buildQuickAddTags();
+      };
+      wrap.appendChild(btn);
+    });
+
+    if (selectedQuickAddTags.size > 0) {
+      const clear = document.createElement("div");
+      clear.className = "chip small";
+      clear.textContent = "clear";
+      clear.onclick = () => {
+        selectedQuickAddTags.clear();
+        buildQuickAddTags();
+      };
+      wrap.appendChild(clear);
+    }
+  }
+
+  // --- Filtering logic (multi-select AND) ---
+  function statusMatches(d) {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "stock") return (d.status === "have" || d.status === "limited");
+    return d.status === statusFilter;
+  }
+
+  function tagsMatch(d) {
+    if (selectedTags.size === 0) return true;
+    // AND logic: every selected tag must be present
+    for (const t of selectedTags) {
+      if (!d.tags_list.includes(t)) return false;
+    }
+    return true;
+  }
+
+  function getFiltered() {
+    return drinks.filter(d => statusMatches(d) && tagsMatch(d));
+  }
+
+  function toggleEditor(el) {
+    const editor = el.nextElementSibling;
+    editor.style.display = (editor.style.display === "block" ? "none" : "block");
+  }
+
+  async function changeStatus(key, status) {
+    const item = drinks.find(d => d.key === key);
+    if (!item) return;
+
+    item.status = status; // optimistic
+    render();
+
+    await postAction({
+      token: UPDATE_TOKEN,
+      action: "updateStatus",
+      key,
+      status
+    });
+
+    setTimeout(load, 1200);
+  }
+
+  function render() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    const list = getFiltered();
+
+    // Subtitle counts (overall, not just filtered)
+    const have = drinks.filter(d => d.status === "have").length;
+    const limited = drinks.filter(d => d.status === "limited").length;
+    const out = drinks.filter(d => d.status === "out").length;
+    document.getElementById("subtitle").textContent =
+      `${have} have • ${limited} limited • ${out} out` +
+      (selectedTags.size ? ` • tags: ${Array.from(selectedTags).join(", ")}` : "");
+
+    list.forEach(d => {
+      const searchUrl = buildGoogleSearchUrl(d.name, d.category);
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const statusClass = (d.status === "have") ? "haveBadge" : (d.status === "limited") ? "limitedBadge" : "outBadge";
+
+      const tagsPills = (d.tags_list || [])
+        .map(t => `<span class="tagPill">${escapeHtml(t)}</span>`)
+        .join("");
+
+      card.innerHTML = `
+        ${d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(d.name)}">` : ""}
+        <div class="name">
+          <a href="${searchUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.name)}</a>
+          <a class="searchIcon" href="${searchUrl}" target="_blank" rel="noopener noreferrer" title="Search">🔍</a>
+        </div>
+        <div class="meta">${escapeHtml(d.brand || "")}${(d.brand && d.category) ? " • " : ""}${escapeHtml(d.category || "")}</div>
+
+        <div class="pillrow">
+          <span class="status ${statusClass}">${escapeHtml(d.status.toUpperCase())}</span>
+          ${d.package ? `<span class="tagPill">${escapeHtml(d.package)}</span>` : ""}
+        </div>
+
+        ${tagsPills ? `<div class="pillrow">${tagsPills}</div>` : ""}
+
+        <span class="miniLink" onclick="toggleEditor(this)">Status wrong?</span>
+        <div class="editor">
+          <button class="haveBadge" onclick="changeStatus('${escapeAttr(d.key)}','have')">Have</button>
+          <button class="limitedBadge" onclick="changeStatus('${escapeAttr(d.key)}','limited')">Limited</button>
+          <button class="outBadge" onclick="changeStatus('${escapeAttr(d.key)}','out')">Out</button>
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+    }[m]));
+  }
+  function escapeAttr(str) {
+    return String(str).replace(/'/g, "\\'");
+  }
+
+  // --- Quick Add / Request ---
+  function clearQuickAdd() {
+    document.getElementById("qa_name").value = "";
+    document.getElementById("qa_brand").value = "";
+    document.getElementById("qa_category").value = "";
+    document.getElementById("qa_package").value = "";
+    document.getElementById("qa_status").value = "have";
+    document.getElementById("qa_image").value = "";
+    selectedQuickAddTags.clear();
+    buildQuickAddTags();
+  }
+
+  async function submitQuickAdd() {
+    const btn = document.getElementById("qa_submit");
+    if (btn.disabled) return; // hard guard
+
+    const name = document.getElementById("qa_name").value.trim();
+    const brand = document.getElementById("qa_brand").value.trim();
+    const category = document.getElementById("qa_category").value.trim();
+    const pkg = document.getElementById("qa_package").value.trim();
+    const status = document.getElementById("qa_status").value.trim();
+    const image = document.getElementById("qa_image").value.trim();
+
+    if (!name) { alert("Name is required."); return; }
+
+    // Disable + change label to prevent double-submit
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "Adding…";
+
+    const tags = Array.from(selectedQuickAddTags);
+
+    try {
+      await postAction({
+        token: UPDATE_TOKEN,
+        action: "addItem",
+        name, brand, category,
+        package: pkg,
+        status,
+        image,
+        tags
+      });
+
+      clearQuickAdd();
+      document.getElementById("quickAddPanel").classList.remove("show");
+      setTimeout(load, 1200);
+    } finally {
+      // re-enable after a short debounce
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = original;
+      }, 1400);
+    }
+  }
+
+  function clearRequest() {
+    document.getElementById("rq_request").value = "";
+    document.getElementById("rq_by").value = "";
+    document.getElementById("rq_notes").value = "";
+  }
+
+  async function submitRequest() {
+    const btn = document.getElementById("rq_submit");
+    if (btn.disabled) return;
+
+    const request = document.getElementById("rq_request").value.trim();
+    const requested_by = document.getElementById("rq_by").value.trim();
+    const notes = document.getElementById("rq_notes").value.trim();
+
+    if (!request) { alert("Request is required."); return; }
+
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = "Sending…";
+
+    try {
+      await postAction({
+        token: UPDATE_TOKEN,
+        action: "addRequest",
+        request,
+        requested_by,
+        notes
+      });
+
+      clearRequest();
+      document.getElementById("requestPanel").classList.remove("show");
+      alert("Request sent.");
+    } finally {
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = original;
+      }, 900);
+    }
+  }
+
+  async function load() {
+    const csvText = await fetchCsv(SHEET_CSV_URL);
+    drinks = parseCSV(csvText);
+
+    buildStatusFilters();
+    buildTagFilters();
+    render();
+
+    document.getElementById("updated").textContent = `Last refreshed: ${new Date().toLocaleString()}`;
+  }
+
+  // Expose functions for inline onclick
+  window.togglePanel = togglePanel;
+  window.clearQuickAdd = clearQuickAdd;
+  window.submitQuickAdd = submitQuickAdd;
+  window.clearRequest = clearRequest;
+  window.submitRequest = submitRequest;
+  window.toggleEditor = toggleEditor;
+  window.changeStatus = changeStatus;
+
+  buildQuickAddTags();
+  load().catch(err => {
+    console.error(err);
+    document.getElementById("subtitle").textContent =
+      "Failed to load sheet. Confirm Published to web is enabled and the gid is correct.";
   });
-}
 
-function toggleEditor(el) {
-  const editor = el.nextElementSibling;
-  editor.style.display = (editor.style.display === "block" ? "none" : "block");
-}
-
-async function changeStatus(key, status) {
-  const item = drinks.find(d => d.key === key);
-  if (!item) return;
-
-  item.status = status; // optimistic UI
-  render();
-
-  await postAction({
-    token: UPDATE_TOKEN,
-    action: "updateStatus",
-    key: key,
-    status: status
-  });
-
-  setTimeout(load, 1200);
-}
-
-function render() {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  drinks.forEach(d => {
-    const searchUrl = buildSearch(d.name, d.category);
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const brand = d.brand || "";
-    const category = d.category || "";
-    const pkg = d.package || "";
-
-    card.innerHTML = `
-      ${d.image ? `<img src="${d.image}" alt="${d.name}">` : ""}
-      <div class="name">
-        <a href="${searchUrl}" target="_blank" rel="noopener noreferrer">${d.name}</a>
-        <a class="searchIcon" href="${searchUrl}" target="_blank" rel="noopener noreferrer" title="Search">🔍</a>
-      </div>
-      <div class="meta">${brand}${brand && category ? " • " : ""}${category}</div>
-      <div class="pillrow">
-        <span class="status ${d.status}">${d.status.toUpperCase()}</span>
-        ${pkg ? `<span class="tag">${pkg}</span>` : ""}
-      </div>
-      <span class="miniLink" onclick="toggleEditor(this)">Status wrong?</span>
-      <div class="editor">
-        <button class="have" onclick="changeStatus('${d.key}','have')">Have</button>
-        <button class="limited" onclick="changeStatus('${d.key}','limited')">Limited</button>
-        <button class="out" onclick="changeStatus('${d.key}','out')">Out</button>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-async function load() {
-  const res = await fetch(SHEET_CSV_URL + "&_=" + Date.now());
-  const text = await res.text();
-  drinks = parseCSV(text);
-  render();
-  document.getElementById("updated").textContent =
-    "Last refreshed: " + new Date().toLocaleString();
-}
-
-/* Panels */
-function togglePanel(id) {
-  const panel = document.getElementById(id);
-  panel.classList.toggle("show");
-}
-
-/* Quick Add */
-function clearQuickAdd() {
-  document.getElementById("qa_name").value = "";
-  document.getElementById("qa_brand").value = "";
-  document.getElementById("qa_category").value = "";
-  document.getElementById("qa_package").value = "";
-  document.getElementById("qa_status").value = "have";
-  document.getElementById("qa_image").value = "";
-}
-
-async function submitQuickAdd() {
-  const name = document.getElementById("qa_name").value.trim();
-  const brand = document.getElementById("qa_brand").value.trim();
-  const category = document.getElementById("qa_category").value.trim();
-  const pkg = document.getElementById("qa_package").value.trim();
-  const status = document.getElementById("qa_status").value.trim();
-  const image = document.getElementById("qa_image").value.trim();
-
-  if (!name) { alert("Name is required."); return; }
-
-  await postAction({
-    token: UPDATE_TOKEN,
-    action: "addItem",
-    name, brand, category,
-    package: pkg,
-    status,
-    image
-  });
-
-  clearQuickAdd();
-  document.getElementById("quickAddPanel").classList.remove("show");
-  setTimeout(load, 1200);
-}
-
-/* Request */
-function clearRequest() {
-  document.getElementById("rq_request").value = "";
-  document.getElementById("rq_by").value = "";
-  document.getElementById("rq_notes").value = "";
-}
-
-async function submitRequest() {
-  const request = document.getElementById("rq_request").value.trim();
-  const requested_by = document.getElementById("rq_by").value.trim();
-  const notes = document.getElementById("rq_notes").value.trim();
-
-  if (!request) { alert("Request is required."); return; }
-
-  await postAction({
-    token: UPDATE_TOKEN,
-    action: "addRequest",
-    request,
-    requested_by,
-    notes
-  });
-
-  clearRequest();
-  document.getElementById("requestPanel").classList.remove("show");
-  alert("Request sent.");
-}
-
-load();
-setInterval(load, 60000);
+  if (REFRESH_SECONDS > 0) {
+    setInterval(() => load().catch(console.error), REFRESH_SECONDS * 1000);
+  }
 </script>
 
 </body>
