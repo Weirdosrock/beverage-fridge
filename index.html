@@ -1,78 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Beverage Fridge</title>
 <style>
-  body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; margin:0; padding:20px; background:#0f172a; color:#f1f5f9; }
-  h1 { text-align:center; margin:6px 0 10px; }
-  .sub { text-align:center; opacity:.85; font-size:.95rem; margin-bottom:14px; }
+body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:#0f172a; color:#f1f5f9; padding:20px; margin:0; }
+h1 { text-align:center; }
 
-  .controls { text-align:center; margin-bottom:10px; }
-  button { padding:8px 14px; margin:4px; border-radius:10px; border:none; cursor:pointer; background:#334155; color:#f1f5f9; }
-  button.active { outline:2px solid #94a3b8; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
 
-  .have { background:#16a34a; }
-  .limited { background:#eab308; color:#111827; }
-  .out { background:#dc2626; }
-  .stock { background:#0ea5e9; color:#0b1220; }
-  .editToggle { background:#475569; }
+.card { background:#1e293b; padding:14px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; }
-  .card { background:#1e293b; border-radius:14px; padding:12px; text-align:center; box-shadow:0 8px 20px rgba(0,0,0,.25); }
-  .card img { width:100%; height:120px; object-fit:contain; margin-bottom:10px; background:#0b1220; border-radius:10px; }
+.card img { width:100%; height:120px; object-fit:contain; background:#0b1220; border-radius:10px; margin-bottom:10px; }
 
-  .name { font-weight:800; font-size:1.05rem; display:flex; justify-content:center; align-items:center; gap:6px; }
-  .name a { color:#f1f5f9; text-decoration:none; }
-  .name a:hover { text-decoration:underline; }
+.name { font-weight:700; display:flex; justify-content:center; align-items:center; gap:6px; }
 
-  .searchIcon {
-    font-size:0.9rem;
-    background:#0b1220;
-    padding:4px 6px;
-    border-radius:6px;
-    border:1px solid rgba(255,255,255,.15);
-  }
+.searchIcon {
+  font-size:.9rem;
+  background:#0b1220;
+  padding:4px 6px;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,.15);
+}
 
-  .meta { opacity:.85; font-size:.85rem; margin-top:6px; }
-  .pillrow { margin-top:10px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
-  .status { padding:4px 10px; border-radius:999px; font-size:.8rem; }
-  .tag { padding:4px 10px; border-radius:999px; font-size:.75rem; background:#0b1220; }
+.meta { font-size:.85rem; opacity:.85; text-align:center; margin-top:6px; }
 
-  .editor { margin-top:10px; display:none; gap:6px; justify-content:center; flex-wrap:wrap; }
-  .editor.show { display:flex; }
+.pillrow { display:flex; justify-content:center; gap:8px; margin-top:8px; }
 
-  .miniBtn {
-    padding:5px 10px;
-    border-radius:999px;
-    font-size:.75rem;
-    border:none;
-    cursor:pointer;
-  }
+.status { padding:4px 10px; border-radius:999px; font-size:.8rem; }
+.have { background:#16a34a; }
+.limited { background:#eab308; color:#111827; }
+.out { background:#dc2626; }
 
-  .footer { text-align:center; opacity:.7; font-size:.82rem; margin-top:16px; }
+.tag { padding:4px 10px; border-radius:999px; background:#0b1220; font-size:.75rem; }
+
+.miniLink {
+  display:block;
+  text-align:center;
+  font-size:.75rem;
+  margin-top:10px;
+  opacity:.6;
+  cursor:pointer;
+}
+
+.editor {
+  display:none;
+  margin-top:8px;
+  text-align:center;
+}
+
+.editor button {
+  margin:4px;
+  padding:6px 10px;
+  border:none;
+  border-radius:999px;
+  font-size:.75rem;
+  cursor:pointer;
+}
+
+.footer { text-align:center; margin-top:16px; font-size:.8rem; opacity:.6; }
 </style>
 </head>
 
 <body>
-  <h1>Beverage Fridge</h1>
-  <div class="sub" id="subtitle">Loading…</div>
+<h1>Beverage Fridge</h1>
 
-  <div class="controls">
-    <button class="stock" onclick="setFilter('stock')">In Stock</button>
-    <button class="have" onclick="setFilter('have')">Have</button>
-    <button class="limited" onclick="setFilter('limited')">Limited</button>
-    <button class="out" onclick="setFilter('out')">Out</button>
-    <button onclick="setFilter('all')">All</button>
-  </div>
-
-  <div class="controls">
-    <button id="editToggle" class="editToggle" onclick="toggleEdit()">Fridge status wrong?</button>
-  </div>
-
-  <div class="grid" id="grid"></div>
-  <div class="footer" id="updated"></div>
+<div class="grid" id="grid"></div>
+<div class="footer" id="updated"></div>
 
 <script>
 const SHEET_CSV_URL =
@@ -81,31 +76,63 @@ const SHEET_CSV_URL =
 const UPDATE_ENDPOINT_URL =
 "https://script.google.com/macros/s/AKfycbzDRHY4QHV2Ab1G_8JjvOJ2cTa0HVOgcgexWr6Ly-WGzpTaGU6tE-62OsM-RzBx3bZfHQ/exec";
 
-// MUST match Apps Script TOKEN
 const UPDATE_TOKEN = "bfridge-7Hn93kLq2pXz-2026";
 
 let drinks = [];
-let filter = "stock";
-let editMode = false;
-
-function toggleEdit() {
-  editMode = !editMode;
-  render();
-}
-
-function setFilter(f) {
-  filter = f;
-  render();
-}
 
 function normalizeStatus(s) {
   s = String(s || "").toLowerCase().trim();
   return ["have","limited","out"].includes(s) ? s : "limited";
 }
 
+// Robust CSV parser
 function parseCSV(text) {
-  const rows = text.trim().split("\n").map(r => r.split(","));
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    const next = text[i+1];
+
+    if (c === '"' && inQuotes && next === '"') {
+      cell += '"';
+      i++;
+      continue;
+    }
+
+    if (c === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (c === ',' && !inQuotes) {
+      row.push(cell);
+      cell = '';
+      continue;
+    }
+
+    if ((c === '\n' || c === '\r') && !inQuotes) {
+      if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = '';
+      }
+      continue;
+    }
+
+    cell += c;
+  }
+
+  if (cell) {
+    row.push(cell);
+    rows.push(row);
+  }
+
   const headers = rows[0].map(h => h.toLowerCase());
+
   return rows.slice(1).map(r => {
     const obj = {};
     headers.forEach((h,i) => obj[h] = (r[i] || "").trim());
@@ -132,17 +159,11 @@ async function updateStatus(key, status) {
   });
 }
 
-function getFiltered() {
-  if (filter === "all") return drinks;
-  if (filter === "stock") return drinks.filter(d => d.status !== "out");
-  return drinks.filter(d => d.status === filter);
-}
-
 function render() {
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
 
-  getFiltered().forEach(d => {
+  drinks.forEach(d => {
     const card = document.createElement("div");
     card.className = "card";
 
@@ -159,14 +180,21 @@ function render() {
         <span class="status ${d.status}">${d.status.toUpperCase()}</span>
         ${d.package ? `<span class="tag">${d.package}</span>` : ""}
       </div>
-      <div class="editor ${editMode ? "show" : ""}">
-        <button class="miniBtn have" onclick="changeStatus('${d.key}','have')">Have</button>
-        <button class="miniBtn limited" onclick="changeStatus('${d.key}','limited')">Limited</button>
-        <button class="miniBtn out" onclick="changeStatus('${d.key}','out')">Out</button>
+      <span class="miniLink" onclick="toggleEditor(this)">Status wrong?</span>
+      <div class="editor">
+        <button class="have" onclick="changeStatus('${d.key}','have')">Have</button>
+        <button class="limited" onclick="changeStatus('${d.key}','limited')">Limited</button>
+        <button class="out" onclick="changeStatus('${d.key}','out')">Out</button>
       </div>
     `;
+
     grid.appendChild(card);
   });
+}
+
+function toggleEditor(el) {
+  const editor = el.nextElementSibling;
+  editor.style.display = editor.style.display === "block" ? "none" : "block";
 }
 
 async function changeStatus(key, status) {
@@ -176,7 +204,7 @@ async function changeStatus(key, status) {
   item.status = status;
   render();
   await updateStatus(key, status);
-  setTimeout(load, 1500);
+  setTimeout(load, 1200);
 }
 
 async function load() {
