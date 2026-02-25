@@ -4,17 +4,62 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Beverage Fridge</title>
+
 <style>
-body { font-family:-apple-system,BlinkMacSystemFont,sans-serif; background:#0f172a; color:#f1f5f9; padding:20px; margin:0; }
-h1 { text-align:center; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#0f172a;
+  color:#f1f5f9;
+  padding:20px;
+  margin:0;
+}
 
-.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:14px; }
+h1 { text-align:center; margin-bottom:20px; }
 
-.card { background:#1e293b; padding:14px; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:16px;
+}
 
-.card img { width:100%; height:120px; object-fit:contain; background:#0b1220; border-radius:10px; margin-bottom:10px; }
+.card {
+  background:#1e293b;
+  padding:14px;
+  border-radius:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.3);
+}
 
-.name { font-weight:700; display:flex; justify-content:center; align-items:center; gap:6px; }
+.card img {
+  width:100%;
+  height:120px;
+  object-fit:contain;
+  background:#0b1220;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+/* NAME + LINK STYLE FIX */
+.name {
+  font-weight:700;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+}
+
+.name a {
+  color:inherit;
+  text-decoration:none;
+}
+
+.name a:visited {
+  color:inherit;
+}
+
+.name a:hover {
+  text-decoration:underline;
+  opacity:.9;
+}
 
 .searchIcon {
   font-size:.9rem;
@@ -22,18 +67,45 @@ h1 { text-align:center; }
   padding:4px 6px;
   border-radius:6px;
   border:1px solid rgba(255,255,255,.15);
+  color:#cbd5e1;
+  text-decoration:none;
 }
 
-.meta { font-size:.85rem; opacity:.85; text-align:center; margin-top:6px; }
+.searchIcon:hover {
+  background:#1e293b;
+  border-color:rgba(255,255,255,.35);
+}
 
-.pillrow { display:flex; justify-content:center; gap:8px; margin-top:8px; }
+.meta {
+  font-size:.85rem;
+  opacity:.85;
+  text-align:center;
+  margin-top:6px;
+}
 
-.status { padding:4px 10px; border-radius:999px; font-size:.8rem; }
+.pillrow {
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-top:8px;
+}
+
+.status {
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.8rem;
+}
+
 .have { background:#16a34a; }
 .limited { background:#eab308; color:#111827; }
 .out { background:#dc2626; }
 
-.tag { padding:4px 10px; border-radius:999px; background:#0b1220; font-size:.75rem; }
+.tag {
+  padding:4px 10px;
+  border-radius:999px;
+  background:#0b1220;
+  font-size:.75rem;
+}
 
 .miniLink {
   display:block;
@@ -42,6 +114,10 @@ h1 { text-align:center; }
   margin-top:10px;
   opacity:.6;
   cursor:pointer;
+}
+
+.miniLink:hover {
+  opacity:.9;
 }
 
 .editor {
@@ -57,19 +133,27 @@ h1 { text-align:center; }
   border-radius:999px;
   font-size:.75rem;
   cursor:pointer;
+  color:white;
 }
 
-.footer { text-align:center; margin-top:16px; font-size:.8rem; opacity:.6; }
+.footer {
+  text-align:center;
+  margin-top:20px;
+  font-size:.8rem;
+  opacity:.6;
+}
 </style>
 </head>
 
 <body>
+
 <h1>Beverage Fridge</h1>
 
 <div class="grid" id="grid"></div>
 <div class="footer" id="updated"></div>
 
 <script>
+
 const SHEET_CSV_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzb-W4uPTyGJPj9aZez-MkWa923Ktrs6CDZnlN9VyuRPaYijJhLyPU8xVllMojrzY-iOx0gj5A9nFI/pub?output=csv&gid=0";
 
@@ -85,7 +169,7 @@ function normalizeStatus(s) {
   return ["have","limited","out"].includes(s) ? s : "limited";
 }
 
-// Robust CSV parser
+/* Robust CSV parser */
 function parseCSV(text) {
   const rows = [];
   let row = [];
@@ -164,10 +248,11 @@ function render() {
   grid.innerHTML = "";
 
   drinks.forEach(d => {
-    const card = document.createElement("div");
-    card.className = "card";
 
     const searchUrl = buildSearch(d.name, d.category);
+
+    const card = document.createElement("div");
+    card.className = "card";
 
     card.innerHTML = `
       ${d.image ? `<img src="${d.image}" alt="${d.name}">` : ""}
@@ -194,7 +279,8 @@ function render() {
 
 function toggleEditor(el) {
   const editor = el.nextElementSibling;
-  editor.style.display = editor.style.display === "block" ? "none" : "block";
+  editor.style.display =
+    editor.style.display === "block" ? "none" : "block";
 }
 
 async function changeStatus(key, status) {
@@ -218,6 +304,8 @@ async function load() {
 
 load();
 setInterval(load, 60000);
+
 </script>
+
 </body>
 </html>
