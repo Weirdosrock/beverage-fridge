@@ -386,12 +386,12 @@
     "unsweetened"
   ];
 
-  const LOCATION_DEFS = [
-    { id: "all", label: "All" },
-    { id: "beverage", label: "🥤 Beverage" },
-    { id: "garage", label: "🍻 Garage" },
-    { id: "main", label: "🧊 Main" }
-  ];
+const LOCATION_DEFS = [
+  { id: "all", label: "All" },
+  { id: "beverage", label: "🥤 Dining" },
+  { id: "garage", label: "🍻 Garage" },
+  { id: "main", label: "🧊 Main" }
+];
   // ====================
 
   let drinks = [];
@@ -657,7 +657,7 @@
         (d.status === "limited") ? "limitedBadge" : "outBadge";
 
       const locText =
-        d.location === "beverage" ? "🥤 beverage" :
+        d.location === "beverage" ? "🥤 dining" :
         d.location === "garage" ? "🍻 garage" :
         d.location === "main" ? "🧊 main" : "";
 
