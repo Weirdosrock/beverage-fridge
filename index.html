@@ -14,14 +14,8 @@
     margin:0;
   }
 
-  h1 { text-align:center; margin:0 0 12px; }
-
-  .sub {
-    text-align:center;
-    opacity:.75;
-    font-size:.92rem;
-    margin-bottom:14px;
-  }
+  h1 { text-align:center; margin:0 0 10px; }
+  .sub { text-align:center; opacity:.75; font-size:.92rem; margin-bottom:14px; }
 
   .topActions {
     display:flex;
@@ -44,7 +38,7 @@
   .actionBtn:disabled { opacity:.55; cursor:not-allowed; }
 
   .panel {
-    max-width:820px;
+    max-width:860px;
     margin:0 auto 14px;
     background:#111c33;
     border:1px solid rgba(255,255,255,.10);
@@ -60,7 +54,7 @@
     grid-template-columns: 1fr 1fr;
     gap:10px;
   }
-  @media (max-width: 700px) { .formRow { grid-template-columns: 1fr; } }
+  @media (max-width: 740px) { .formRow { grid-template-columns: 1fr; } }
 
   label { font-size:.8rem; opacity:.8; display:block; margin-bottom:6px; }
   input, select, textarea {
@@ -81,7 +75,6 @@
     margin-top:10px;
     flex-wrap:wrap;
   }
-
   .primary {
     background:#0ea5e9;
     color:#0b1220;
@@ -91,15 +84,10 @@
     background:#475569;
     border-color: transparent;
   }
-
-  .notice {
-    font-size:.82rem;
-    opacity:.75;
-    margin-top:8px;
-  }
+  .notice { font-size:.82rem; opacity:.75; margin-top:8px; }
 
   .controlsWrap {
-    max-width:980px;
+    max-width:1100px;
     margin:0 auto 14px;
     display:flex;
     flex-direction:column;
@@ -125,19 +113,18 @@
   }
   .chip:hover { border-color: rgba(255,255,255,.30); }
   .chip.active { outline:2px solid rgba(203,213,225,.9); }
+  .chip.small { font-size:.78rem; padding:6px 10px; background:#0b1220; }
 
   .chip.have { background:#16a34a; border-color:transparent; }
   .chip.limited { background:#eab308; color:#111827; border-color:transparent; }
   .chip.out { background:#dc2626; border-color:transparent; }
   .chip.stock { background:#0ea5e9; color:#0b1220; border-color:transparent; }
 
-  .chip.small { font-size:.78rem; padding:6px 10px; background:#0b1220; }
-
   .grid {
     display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
     gap:16px;
-    max-width:1100px;
+    max-width:1200px;
     margin:0 auto;
   }
 
@@ -158,7 +145,7 @@
   }
 
   .name {
-    font-weight:750;
+    font-weight:760;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -238,12 +225,7 @@
     color:white;
   }
 
-  .footer {
-    text-align:center;
-    margin-top:20px;
-    font-size:.8rem;
-    opacity:.6;
-  }
+  .footer { text-align:center; margin-top:20px; font-size:.8rem; opacity:.6; }
 </style>
 </head>
 
@@ -263,16 +245,16 @@
     <div class="formRow">
       <div>
         <label>Name (required)</label>
-        <input id="qa_name" placeholder="e.g., Diet Coke Cherry" />
+        <input id="qa_name" placeholder="e.g., Health-Ade Pink Lady Kombucha" />
       </div>
       <div>
         <label>Brand</label>
-        <input id="qa_brand" placeholder="e.g., Coca-Cola" />
+        <input id="qa_brand" placeholder="e.g., Health-Ade" />
       </div>
 
       <div>
         <label>Category</label>
-        <input id="qa_category" placeholder="e.g., Soda" />
+        <input id="qa_category" placeholder="e.g., Kombucha" />
       </div>
       <div>
         <label>Package</label>
@@ -293,14 +275,28 @@
         </select>
       </div>
       <div>
+        <label>Location</label>
+        <select id="qa_location">
+          <option value="">(required)</option>
+          <option value="beverage">🥤 beverage</option>
+          <option value="garage">🍻 garage</option>
+          <option value="main">🧊 main</option>
+        </select>
+      </div>
+
+      <div>
         <label>Image path (optional)</label>
-        <input id="qa_image" placeholder="image/newdrink.jpeg" />
+        <input id="qa_image" placeholder="image/healthade-pink-lady-kombucha.jpeg" />
+      </div>
+      <div>
+        <label>Key (optional)</label>
+        <input id="qa_key" placeholder="leave blank to auto-generate" />
       </div>
 
       <div style="grid-column:1 / -1;">
         <label>Tags (multi-select)</label>
         <div class="rowControls" id="qa_tags"></div>
-        <div class="notice">Tip: choose one from caffeine + alcohol + sweetness. (Carbonated is optional.)</div>
+        <div class="notice">Multi-select is allowed. Filters will AND-narrow on the site.</div>
       </div>
     </div>
 
@@ -308,6 +304,8 @@
       <button class="actionBtn danger" onclick="clearQuickAdd()">Clear</button>
       <button class="actionBtn primary" id="qa_submit" onclick="submitQuickAdd()">Add to Sheet</button>
     </div>
+
+    <div class="notice">Tip: leave image blank if you haven’t uploaded it yet—add later and update the row.</div>
   </div>
 
   <!-- Request Panel -->
@@ -334,11 +332,12 @@
       <button class="actionBtn primary" id="rq_submit" onclick="submitRequest()">Send Request</button>
     </div>
 
-    <div class="notice">Requests go to a “Requests” tab in the same spreadsheet (auto-created if missing).</div>
+    <div class="notice">Requests go to a “Requests” tab in the same spreadsheet.</div>
   </div>
 
   <!-- Filters -->
   <div class="controlsWrap">
+    <div class="rowControls" id="locationFilters"></div>
     <div class="rowControls" id="statusFilters"></div>
     <div class="rowControls" id="tagFilters"></div>
   </div>
@@ -355,7 +354,7 @@
     "https://script.google.com/macros/s/AKfycbzDRHY4QHV2Ab1G_8JjvOJ2cTa0HVOgcgexWr6Ly-WGzpTaGU6tE-62OsM-RzBx3bZfHQ/exec";
 
   // MUST match Apps Script TOKEN
-  const UPDATE_TOKEN = "bfridge-7Hn93kLq2pXz-2026";
+  const UPDATE_TOKEN = "PUT_YOUR_REAL_TOKEN_HERE";
 
   const REFRESH_SECONDS = 60;
 
@@ -366,21 +365,35 @@
     "alcoholic",
     "non-alcoholic",
     "carbonated",
+    "still",
     "full-sugar",
     "diet",
     "low-sugar",
     "unsweetened"
   ];
+
+  const LOCATION_DEFS = [
+    { id: "all", label: "All" },
+    { id: "beverage", label: "🥤 Beverage" },
+    { id: "garage", label: "🍻 Garage" },
+    { id: "main", label: "🧊 Main" }
+  ];
   // ====================
 
   let drinks = [];
-  let statusFilter = "stock"; // stock = have + limited
-  const selectedTags = new Set(); // multi-select AND
-  const selectedQuickAddTags = new Set();
+  let locationFilter = "all";  // all / beverage / garage / main
+  let statusFilter = "stock";  // stock = have + limited
+  const selectedTags = new Set();         // multi-select AND filter
+  const selectedQuickAddTags = new Set(); // multi-select for Quick Add
 
   function normalizeStatus(s) {
     const v = String(s || "").trim().toLowerCase();
     return (v === "have" || v === "limited" || v === "out") ? v : "limited";
+  }
+
+  function normalizeLocation(s) {
+    const v = String(s || "").trim().toLowerCase();
+    return (v === "beverage" || v === "garage" || v === "main") ? v : "";
   }
 
   function normalizeTagsStr(s) {
@@ -390,11 +403,11 @@
       .filter(Boolean);
   }
 
-  // Robust CSV parser (handles quotes/commas)
+  // Robust CSV parser (handles commas inside quotes)
   function parseCSV(text) {
     const rows = [];
     let row = [];
-    let cell = '';
+    let cell = "";
     let inQuotes = false;
 
     for (let i = 0; i < text.length; i++) {
@@ -404,14 +417,14 @@
       if (c === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
       if (c === '"') { inQuotes = !inQuotes; continue; }
 
-      if (!inQuotes && c === ',') { row.push(cell); cell = ''; continue; }
+      if (!inQuotes && c === ",") { row.push(cell); cell = ""; continue; }
 
-      if (!inQuotes && (c === '\n' || c === '\r')) {
-        if (c === '\r' && next === '\n') i++;
+      if (!inQuotes && (c === "\n" || c === "\r")) {
+        if (c === "\r" && next === "\n") i++;
         row.push(cell);
         rows.push(row);
         row = [];
-        cell = '';
+        cell = "";
         continue;
       }
 
@@ -430,6 +443,7 @@
         obj.status = normalizeStatus(obj.status);
         obj.key = String(obj.key || "").trim().toLowerCase();
         obj.tags_list = normalizeTagsStr(obj.tags);
+        obj.location = normalizeLocation(obj.location);
 
         return obj;
       });
@@ -462,7 +476,24 @@
     document.getElementById(id).classList.toggle("show");
   }
 
-  // --- Filters UI ---
+  // ---------- FILTER UI ----------
+  function buildLocationFilters() {
+    const wrap = document.getElementById("locationFilters");
+    wrap.innerHTML = "";
+
+    LOCATION_DEFS.forEach(d => {
+      const btn = document.createElement("div");
+      btn.className = "chip" + (locationFilter === d.id ? " active" : "");
+      btn.textContent = d.label;
+      btn.onclick = () => {
+        locationFilter = d.id;
+        buildLocationFilters();
+        render();
+      };
+      wrap.appendChild(btn);
+    });
+  }
+
   function buildStatusFilters() {
     const wrap = document.getElementById("statusFilters");
     wrap.innerHTML = "";
@@ -505,7 +536,6 @@
       wrap.appendChild(btn);
     });
 
-    // Clear button only when something is selected
     if (selectedTags.size > 0) {
       const clear = document.createElement("div");
       clear.className = "chip small";
@@ -519,7 +549,7 @@
     }
   }
 
-  // --- Quick Add tags UI ---
+  // ---------- QUICK ADD TAGS ----------
   function buildQuickAddTags() {
     const wrap = document.getElementById("qa_tags");
     wrap.innerHTML = "";
@@ -548,7 +578,12 @@
     }
   }
 
-  // --- Filtering logic (multi-select AND) ---
+  // ---------- FILTER LOGIC ----------
+  function locationMatches(d) {
+    if (locationFilter === "all") return true;
+    return d.location === locationFilter;
+  }
+
   function statusMatches(d) {
     if (statusFilter === "all") return true;
     if (statusFilter === "stock") return (d.status === "have" || d.status === "limited");
@@ -557,17 +592,17 @@
 
   function tagsMatch(d) {
     if (selectedTags.size === 0) return true;
-    // AND logic: every selected tag must be present
     for (const t of selectedTags) {
-      if (!d.tags_list.includes(t)) return false;
+      if (!d.tags_list.includes(t)) return false; // AND logic
     }
     return true;
   }
 
   function getFiltered() {
-    return drinks.filter(d => statusMatches(d) && tagsMatch(d));
+    return drinks.filter(d => locationMatches(d) && statusMatches(d) && tagsMatch(d));
   }
 
+  // ---------- CARD EDIT ----------
   function toggleEditor(el) {
     const editor = el.nextElementSibling;
     editor.style.display = (editor.style.display === "block" ? "none" : "block");
@@ -590,26 +625,36 @@
     setTimeout(load, 1200);
   }
 
+  // ---------- RENDER ----------
   function render() {
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
     const list = getFiltered();
 
-    // Subtitle counts (overall, not just filtered)
+    // Counts are across ALL items (not just filtered), so the subtitle stays informative
     const have = drinks.filter(d => d.status === "have").length;
     const limited = drinks.filter(d => d.status === "limited").length;
     const out = drinks.filter(d => d.status === "out").length;
+
+    const locLabel = LOCATION_DEFS.find(x => x.id === locationFilter)?.label || "All";
+    const tagLabel = selectedTags.size ? ` • tags: ${Array.from(selectedTags).join(", ")}` : "";
     document.getElementById("subtitle").textContent =
-      `${have} have • ${limited} limited • ${out} out` +
-      (selectedTags.size ? ` • tags: ${Array.from(selectedTags).join(", ")}` : "");
+      `${have} have • ${limited} limited • ${out} out • view: ${locLabel}${tagLabel}`;
 
     list.forEach(d => {
       const searchUrl = buildGoogleSearchUrl(d.name, d.category);
       const card = document.createElement("div");
       card.className = "card";
 
-      const statusClass = (d.status === "have") ? "haveBadge" : (d.status === "limited") ? "limitedBadge" : "outBadge";
+      const statusClass =
+        (d.status === "have") ? "haveBadge" :
+        (d.status === "limited") ? "limitedBadge" : "outBadge";
+
+      const locationPill =
+        d.location === "beverage" ? "🥤 beverage" :
+        d.location === "garage" ? "🍻 garage" :
+        d.location === "main" ? "🧊 main" : "";
 
       const tagsPills = (d.tags_list || [])
         .map(t => `<span class="tagPill">${escapeHtml(t)}</span>`)
@@ -621,11 +666,13 @@
           <a href="${searchUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.name)}</a>
           <a class="searchIcon" href="${searchUrl}" target="_blank" rel="noopener noreferrer" title="Search">🔍</a>
         </div>
+
         <div class="meta">${escapeHtml(d.brand || "")}${(d.brand && d.category) ? " • " : ""}${escapeHtml(d.category || "")}</div>
 
         <div class="pillrow">
           <span class="status ${statusClass}">${escapeHtml(d.status.toUpperCase())}</span>
           ${d.package ? `<span class="tagPill">${escapeHtml(d.package)}</span>` : ""}
+          ${locationPill ? `<span class="tagPill">${escapeHtml(locationPill)}</span>` : ""}
         </div>
 
         ${tagsPills ? `<div class="pillrow">${tagsPills}</div>` : ""}
@@ -651,14 +698,16 @@
     return String(str).replace(/'/g, "\\'");
   }
 
-  // --- Quick Add / Request ---
+  // ---------- QUICK ADD / REQUEST ----------
   function clearQuickAdd() {
     document.getElementById("qa_name").value = "";
     document.getElementById("qa_brand").value = "";
     document.getElementById("qa_category").value = "";
     document.getElementById("qa_package").value = "";
     document.getElementById("qa_status").value = "have";
+    document.getElementById("qa_location").value = "";
     document.getElementById("qa_image").value = "";
+    document.getElementById("qa_key").value = "";
     selectedQuickAddTags.clear();
     buildQuickAddTags();
   }
@@ -672,11 +721,13 @@
     const category = document.getElementById("qa_category").value.trim();
     const pkg = document.getElementById("qa_package").value.trim();
     const status = document.getElementById("qa_status").value.trim();
+    const location = document.getElementById("qa_location").value.trim();
     const image = document.getElementById("qa_image").value.trim();
+    const key = document.getElementById("qa_key").value.trim(); // optional (script can ignore or use if you implement)
 
     if (!name) { alert("Name is required."); return; }
+    if (!location) { alert("Location is required (beverage / garage / main)."); return; }
 
-    // Disable + change label to prevent double-submit
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = "Adding…";
@@ -684,21 +735,26 @@
     const tags = Array.from(selectedQuickAddTags);
 
     try {
+      // If your Apps Script ignores 'key', that's fine.
       await postAction({
         token: UPDATE_TOKEN,
         action: "addItem",
-        name, brand, category,
+        name,
+        brand,
+        category,
         package: pkg,
         status,
+        location,
         image,
-        tags
+        tags,
+        key
       });
 
       clearQuickAdd();
       document.getElementById("quickAddPanel").classList.remove("show");
       setTimeout(load, 1200);
     } finally {
-      // re-enable after a short debounce
+      // debounce to prevent double press
       setTimeout(() => {
         btn.disabled = false;
         btn.textContent = original;
@@ -746,10 +802,12 @@
     }
   }
 
+  // ---------- LOAD ----------
   async function load() {
     const csvText = await fetchCsv(SHEET_CSV_URL);
     drinks = parseCSV(csvText);
 
+    buildLocationFilters();
     buildStatusFilters();
     buildTagFilters();
     render();
@@ -757,7 +815,7 @@
     document.getElementById("updated").textContent = `Last refreshed: ${new Date().toLocaleString()}`;
   }
 
-  // Expose functions for inline onclick
+  // expose for inline onclick
   window.togglePanel = togglePanel;
   window.clearQuickAdd = clearQuickAdd;
   window.submitQuickAdd = submitQuickAdd;
