@@ -169,9 +169,24 @@
 
   .meta {
     font-size:.85rem;
-    opacity:.85;
+    opacity:.88;
     text-align:center;
     margin-top:6px;
+  }
+
+  /* NEW: location line */
+  .locline {
+    text-align:center;
+    margin-top:6px;
+    opacity:.9;
+  }
+  .locpill {
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#0b1220;
+    font-size:.78rem;
+    border:1px solid rgba(255,255,255,.12);
   }
 
   .pillrow {
@@ -358,7 +373,6 @@
 
   const REFRESH_SECONDS = 60;
 
-  // Tag vocabulary (core + sweetness)
   const TAG_VOCAB = [
     "caffeinated",
     "caffeine-free",
@@ -381,10 +395,10 @@
   // ====================
 
   let drinks = [];
-  let locationFilter = "all";  // all / beverage / garage / main
-  let statusFilter = "stock";  // stock = have + limited
-  const selectedTags = new Set();         // multi-select AND filter
-  const selectedQuickAddTags = new Set(); // multi-select for Quick Add
+  let locationFilter = "all";
+  let statusFilter = "stock";
+  const selectedTags = new Set();
+  const selectedQuickAddTags = new Set();
 
   function normalizeStatus(s) {
     const v = String(s || "").trim().toLowerCase();
@@ -403,7 +417,7 @@
       .filter(Boolean);
   }
 
-  // Robust CSV parser (handles commas inside quotes)
+  // Robust CSV parser
   function parseCSV(text) {
     const rows = [];
     let row = [];
@@ -476,7 +490,7 @@
     document.getElementById(id).classList.toggle("show");
   }
 
-  // ---------- FILTER UI ----------
+  // Filters UI
   function buildLocationFilters() {
     const wrap = document.getElementById("locationFilters");
     wrap.innerHTML = "";
@@ -549,7 +563,7 @@
     }
   }
 
-  // ---------- QUICK ADD TAGS ----------
+  // Quick Add tags UI
   function buildQuickAddTags() {
     const wrap = document.getElementById("qa_tags");
     wrap.innerHTML = "";
@@ -578,7 +592,7 @@
     }
   }
 
-  // ---------- FILTER LOGIC ----------
+  // Filter logic
   function locationMatches(d) {
     if (locationFilter === "all") return true;
     return d.location === locationFilter;
@@ -593,7 +607,7 @@
   function tagsMatch(d) {
     if (selectedTags.size === 0) return true;
     for (const t of selectedTags) {
-      if (!d.tags_list.includes(t)) return false; // AND logic
+      if (!d.tags_list.includes(t)) return false;
     }
     return true;
   }
@@ -602,7 +616,7 @@
     return drinks.filter(d => locationMatches(d) && statusMatches(d) && tagsMatch(d));
   }
 
-  // ---------- CARD EDIT ----------
+  // Per-card editor
   function toggleEditor(el) {
     const editor = el.nextElementSibling;
     editor.style.display = (editor.style.display === "block" ? "none" : "block");
@@ -612,27 +626,20 @@
     const item = drinks.find(d => d.key === key);
     if (!item) return;
 
-    item.status = status; // optimistic
+    item.status = status;
     render();
 
-    await postAction({
-      token: UPDATE_TOKEN,
-      action: "updateStatus",
-      key,
-      status
-    });
-
+    await postAction({ token: UPDATE_TOKEN, action: "updateStatus", key, status });
     setTimeout(load, 1200);
   }
 
-  // ---------- RENDER ----------
+  // Render cards (UPDATED LAYOUT)
   function render() {
     const grid = document.getElementById("grid");
     grid.innerHTML = "";
 
     const list = getFiltered();
 
-    // Counts are across ALL items (not just filtered), so the subtitle stays informative
     const have = drinks.filter(d => d.status === "have").length;
     const limited = drinks.filter(d => d.status === "limited").length;
     const out = drinks.filter(d => d.status === "out").length;
@@ -644,14 +651,12 @@
 
     list.forEach(d => {
       const searchUrl = buildGoogleSearchUrl(d.name, d.category);
-      const card = document.createElement("div");
-      card.className = "card";
 
       const statusClass =
         (d.status === "have") ? "haveBadge" :
         (d.status === "limited") ? "limitedBadge" : "outBadge";
 
-      const locationPill =
+      const locText =
         d.location === "beverage" ? "🥤 beverage" :
         d.location === "garage" ? "🍻 garage" :
         d.location === "main" ? "🧊 main" : "";
@@ -660,8 +665,12 @@
         .map(t => `<span class="tagPill">${escapeHtml(t)}</span>`)
         .join("");
 
+      const card = document.createElement("div");
+      card.className = "card";
+
       card.innerHTML = `
         ${d.image ? `<img src="${escapeHtml(d.image)}" alt="${escapeHtml(d.name)}">` : ""}
+
         <div class="name">
           <a href="${searchUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.name)}</a>
           <a class="searchIcon" href="${searchUrl}" target="_blank" rel="noopener noreferrer" title="Search">🔍</a>
@@ -669,10 +678,11 @@
 
         <div class="meta">${escapeHtml(d.brand || "")}${(d.brand && d.category) ? " • " : ""}${escapeHtml(d.category || "")}</div>
 
+        ${locText ? `<div class="locline"><span class="locpill">${escapeHtml(locText)}</span></div>` : ""}
+
         <div class="pillrow">
           <span class="status ${statusClass}">${escapeHtml(d.status.toUpperCase())}</span>
           ${d.package ? `<span class="tagPill">${escapeHtml(d.package)}</span>` : ""}
-          ${locationPill ? `<span class="tagPill">${escapeHtml(locationPill)}</span>` : ""}
         </div>
 
         ${tagsPills ? `<div class="pillrow">${tagsPills}</div>` : ""}
@@ -698,7 +708,7 @@
     return String(str).replace(/'/g, "\\'");
   }
 
-  // ---------- QUICK ADD / REQUEST ----------
+  // Quick Add / Request
   function clearQuickAdd() {
     document.getElementById("qa_name").value = "";
     document.getElementById("qa_brand").value = "";
@@ -714,7 +724,7 @@
 
   async function submitQuickAdd() {
     const btn = document.getElementById("qa_submit");
-    if (btn.disabled) return; // hard guard
+    if (btn.disabled) return;
 
     const name = document.getElementById("qa_name").value.trim();
     const brand = document.getElementById("qa_brand").value.trim();
@@ -723,7 +733,7 @@
     const status = document.getElementById("qa_status").value.trim();
     const location = document.getElementById("qa_location").value.trim();
     const image = document.getElementById("qa_image").value.trim();
-    const key = document.getElementById("qa_key").value.trim(); // optional (script can ignore or use if you implement)
+    const key = document.getElementById("qa_key").value.trim();
 
     if (!name) { alert("Name is required."); return; }
     if (!location) { alert("Location is required (beverage / garage / main)."); return; }
@@ -735,7 +745,6 @@
     const tags = Array.from(selectedQuickAddTags);
 
     try {
-      // If your Apps Script ignores 'key', that's fine.
       await postAction({
         token: UPDATE_TOKEN,
         action: "addItem",
@@ -754,7 +763,6 @@
       document.getElementById("quickAddPanel").classList.remove("show");
       setTimeout(load, 1200);
     } finally {
-      // debounce to prevent double press
       setTimeout(() => {
         btn.disabled = false;
         btn.textContent = original;
@@ -802,7 +810,6 @@
     }
   }
 
-  // ---------- LOAD ----------
   async function load() {
     const csvText = await fetchCsv(SHEET_CSV_URL);
     drinks = parseCSV(csvText);
