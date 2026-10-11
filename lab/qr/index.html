@@ -18,20 +18,18 @@ input{accent-color:#79516b;width:25px;height:25px;flex-shrink:0}
 #details p{border-bottom:1px solid #eee2e7;padding:8px 0}
 .demo{color:#a47790;font-style:italic}
 #qrArea{display:none;margin-top:20px;padding:20px;background:white;border-radius:18px}#presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#presets button{margin:0;padding:17px 5px;font-size:15px}#showQr{position:fixed;z-index:10;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 36px),500px);margin:0;border-radius:19px;min-height:64px;box-shadow:0 9px 30px #533b4b55;background:#75465f}#download{width:100%;background:#eadce4;color:#533b4b}#qrArea{position:fixed;z-index:20;inset:0;margin:0;border-radius:0;background:#f8f3f1;overflow:auto;text-align:center;padding:75px 20px 30px}#qr{display:flex;justify-content:center;padding:22px;background:white;width:max-content;margin:20px auto;border-radius:20px}#shareLink{overflow-wrap:anywhere;font-size:12px;color:#876b7c}#closeQr{display:none;position:fixed;z-index:25;top:max(18px,env(safe-area-inset-top));right:20px;background:#eadce4;color:#533b4b}body.qr-open #closeQr{display:block}
+
+.profile{display:flex;align-items:center;gap:16px}.avatar{width:66px;height:66px;border-radius:19px;flex:none;display:grid;place-items:center;background:#e9d6de;color:#754b65;font:29px Georgia,serif}.profile h1{font-size:30px;margin:0 0 5px}.subtitle{font-size:13px;margin:0;color:#856778}.church{border-top:1px solid #f0e5e9;padding-top:16px;margin:20px 0 0;color:#856778;font-size:13px}.card{padding:25px;box-shadow:0 8px 26px #5b3b4b12}.section-heading{font-size:17px;margin:27px 0 15px}.field-list{border:1px solid #eadce2;border-radius:19px;background:#fffdfb;overflow:hidden}.field-list .field-row{display:flex;align-items:center;gap:13px;border:0;border-bottom:1px solid #f0e5e9;border-radius:0;box-shadow:none;margin:0;min-height:78px;padding:13px 17px;background:transparent}.field-list .field-row:last-child{border-bottom:0}.field-copy{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}.field-copy strong{font-size:15px;font-weight:600}.field-copy small{font-size:12px;letter-spacing:0;color:#927b88;overflow-wrap:anywhere}.field-copy small.demo{color:#a47790}.field-row input{position:absolute;opacity:0;width:1px;height:1px}.field-check{display:grid;place-items:center;width:27px;height:27px;flex:none;border:2px solid #d6c3ce;border-radius:50%;color:white;font-size:16px}.field-row:has(input:checked) .field-check{background:#79516b;border-color:#79516b}.field-row:focus-within{outline:2px solid #79516b;outline-offset:-2px}#presets{background:#eee3e8;border-radius:16px;padding:5px;gap:3px}#presets button{background:transparent;color:#79516b;border-radius:12px;box-shadow:none;min-height:46px;padding:10px 4px}#presets button.active{background:#fffdfb;color:#533b4b;box-shadow:0 2px 7px #5b3b4b18}.save-button{width:100%;background:transparent;color:#79516b;border:1px solid #d9c5cf;margin-top:17px}#showQr{font-weight:700}
 </style>
 </head>
 <body><main>
 <small>ANCHOREDWOOD LAB · CONCEPT PREVIEW</small>
-<div class="card">
-<h1>Erin Wood</h1>
-<p>Pastor of Spiritual Formation &amp; Vision Execution<br>New Life Community Church</p>
-<div id="details"></div>
-</div>
-<h3>Choose what to share</h3>
+<div class="card"><div class="profile"><div class="avatar">EW</div><div><h1>Erin Wood</h1><p class="subtitle">Pastor of Spiritual Formation</p></div></div><p class="church">New Life Community Church</p></div>
+<h3 class="section-heading">What would you like to share?</h3>
 <div id="presets"></div>
-<div id="fields"></div>
+<div class="field-list" id="fields"></div>
 <button id="showQr">Present QR code</button>
-<button id="download">Save contact</button>
+<button id="download" class="save-button">Save contact</button>
 <button id="closeQr" aria-label="Close QR presentation">Close ✕</button><div id="qrArea"><small>READY TO CONNECT</small><h1>Erin Wood</h1><p>Scan to save my contact</p><div id="qr"></div><p id="shareLink"></p></div>
 <p><small>Public concept only. Personal information is fictional filler. Links are not securely access-controlled. No personal data is stored.</small></p>
 </main>
@@ -49,8 +47,8 @@ const presets={Business:["email","workPhone","site"],Personal:["personalPhone","
 let selected=new Set(presets.Business),active="Business";
 function render(){
 document.getElementById("presets").innerHTML=Object.keys(presets).map(k=>'<button class="'+(active===k?"active":"")+'" data-preset="'+k+'">'+k+'</button>').join("");
-document.getElementById("fields").innerHTML=entries.map(([id,label,value,filler])=>'<label><input type="checkbox" data-field="'+id+'" '+(selected.has(id)?"checked":"")+'> '+label+(filler?' <span class="demo">(demo)</span>':'')+'</label>').join("");
-document.getElementById("details").innerHTML=entries.filter(e=>selected.has(e[0])).map(e=>'<p>'+e[1]+': <strong class="'+(e[3]?"demo":"")+'">'+e[2]+'</strong></p>').join("");
+document.getElementById("fields").innerHTML=entries.map(([id,label,value,filler])=>'<label class="field-row"><input type="checkbox" data-field="'+id+'" '+(selected.has(id)?"checked":"")+'><span class="field-copy"><strong>'+label+'</strong><small class="'+(filler?"demo":"")+'">'+value+(filler?" · demo":"")+'</small></span><span class="field-check" aria-hidden="true">'+(selected.has(id)?"✓":"")+'</span></label>').join("");
+
 document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{active=b.dataset.preset;selected=new Set(presets[active]);render()});
 document.querySelectorAll("[data-field]").forEach(b=>b.onchange=()=>{b.checked?selected.add(b.dataset.field):selected.delete(b.dataset.field);active="Custom";render()});
 }
