@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Erin Wood — Digital Card Concept</title>
+<style>
+body{margin:0;background:#f8f3f1;color:#533b4b;font-family:system-ui,sans-serif;padding:24px}
+main{max-width:480px;margin:auto}
+.card{background:#fff;border:1px solid #e9dbe0;border-radius:24px;padding:28px;box-shadow:0 12px 36px #5b3b4b19}
+h1{font:38px Georgia,serif;margin:10px 0}
+small{color:#987589;letter-spacing:1px}
+p{line-height:1.5}
+button{border:0;border-radius:10px;padding:12px 16px;background:#79516b;color:white;margin:5px 3px 5px 0;cursor:pointer}
+button.active{background:#472b40}
+label{display:block;padding:10px;border-bottom:1px solid #ebdfe4}
+input{accent-color:#79516b}
+#details p{border-bottom:1px solid #eee2e7;padding:8px 0}
+.demo{color:#a47790;font-style:italic}
+#qrArea{display:none;margin-top:20px;padding:20px;background:white;border-radius:18px}
+</style>
+</head>
+<body><main>
+<small>ANCHOREDWOOD LAB · CONCEPT PREVIEW</small>
+<div class="card">
+<h1>Erin Wood</h1>
+<p>Pastor of Spiritual Formation &amp; Vision Execution<br>New Life Community Church</p>
+<div id="details"></div>
+</div>
+<h3>Choose what to share</h3>
+<div id="presets"></div>
+<div id="fields"></div>
+<button id="showQr">Present QR code</button>
+<button id="download">Save contact</button>
+<div id="qrArea"><h3>Scan to connect</h3><div id="qr"></div><p id="shareLink"></p></div>
+<p><small>Public concept only. Personal information is fictional filler. Links are not securely access-controlled. No personal data is stored.</small></p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const entries=[
+["email","Work email","erinw@nl-cc.org",false],
+["workPhone","Church phone","(562) 924-4466 ext. 212",false],
+["site","Church website","nl-cc.org",false],
+["personalPhone","Personal phone","(555) 010-2048",true],
+["personalEmail","Personal email","erin.demo@example.com",true],
+["address","Home address","123 Example Lane, Sample City, CA 90000",true],
+["birthday","Birthday","January 1 (sample)",true]];
+const presets={Business:["email","workPhone","site"],Personal:["personalPhone","personalEmail","address","birthday"],Custom:["email","site","personalPhone"]};
+let selected=new Set(presets.Business),active="Business";
+function render(){
+document.getElementById("presets").innerHTML=Object.keys(presets).map(k=>'<button class="'+(active===k?"active":"")+'" data-preset="'+k+'">'+k+'</button>').join("");
+document.getElementById("fields").innerHTML=entries.map(([id,label,value,filler])=>'<label><input type="checkbox" data-field="'+id+'" '+(selected.has(id)?"checked":"")+'> '+label+(filler?' <span class="demo">(demo)</span>':'')+'</label>').join("");
+document.getElementById("details").innerHTML=entries.filter(e=>selected.has(e[0])).map(e=>'<p>'+e[1]+': <strong class="'+(e[3]?"demo":"")+'">'+e[2]+'</strong></p>').join("");
+document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{active=b.dataset.preset;selected=new Set(presets[active]);render()});
+document.querySelectorAll("[data-field]").forEach(b=>b.onchange=()=>{b.checked?selected.add(b.dataset.field):selected.delete(b.dataset.field);active="Custom";render()});
+}
+document.getElementById("showQr").onclick=()=>{
+const url=new URL(location.href);url.search="";url.searchParams.set("fields",[...selected].join(","));url.searchParams.set("expires",Date.now()+172800000);
+document.getElementById("qrArea").style.display="block";
+document.getElementById("qr").innerHTML="";
+if(window.QRCode)new QRCode(document.getElementById("qr"),{text:url.href,width:200,height:200});
+document.getElementById("shareLink").textContent=url.href;
+};
+document.getElementById("download").onclick=()=>{
+const rows=["BEGIN:VCARD","VERSION:3.0","FN:Erin Wood","N:Wood;Erin;;;","ORG:New Life Community Church"];
+if(selected.has("email"))rows.push("EMAIL;TYPE=WORK:erinw@nl-cc.org");
+if(selected.has("workPhone"))rows.push("TEL;TYPE=WORK:(562) 924-4466 ext. 212");
+if(selected.has("site"))rows.push("URL:https://nl-cc.org");
+rows.push("END:VCARD");
+const a=document.createElement("a"),u=URL.createObjectURL(new Blob([rows.join("\r\n")],{type:"text/vcard"}));a.href=u;a.download="Erin-Wood-demo.vcf";a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);
+};
+const params=new URLSearchParams(location.search);
+if(params.has("fields")){const expiry=Number(params.get("expires"));if(!expiry||Date.now()>expiry){document.body.innerHTML="<main><h1>This demo link has expired</h1></main>"}else{selected=new Set(params.get("fields").split(",").filter(k=>entries.some(e=>e[0]===k)));active="Custom"}}
+render();
+</script></body></html>
