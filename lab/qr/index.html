@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Erin Wood — Digital Card Concept</title>
 <style>
-body{margin:0;background:#f8f3f1;color:#533b4b;font-family:system-ui,sans-serif;padding:24px}
-main{max-width:480px;margin:auto}
-.card{background:#fff;border:1px solid #e9dbe0;border-radius:24px;padding:28px;box-shadow:0 12px 36px #5b3b4b19}
+body{margin:0;background:radial-gradient(circle at top right,#f2e1e8,transparent 55%),#f8f3f1;color:#533b4b;font-family:system-ui,sans-serif;padding:24px 18px 120px}
+main{max-width:520px;margin:auto}
+.card{background:#fff;border:1px solid #e9dbe0;border-radius:28px;padding:34px 28px;box-shadow:0 12px 36px #5b3b4b19}
 h1{font:38px Georgia,serif;margin:10px 0}
 small{color:#987589;letter-spacing:1px}
 p{line-height:1.5}
-button{border:0;border-radius:10px;padding:12px 16px;background:#79516b;color:white;margin:5px 3px 5px 0;cursor:pointer}
+button{border:0;border-radius:15px;padding:17px 20px;background:#79516b;color:white;margin:6px 4px 6px 0;cursor:pointer;font-size:16px;font-weight:650;min-height:56px}
 button.active{background:#472b40}
-label{display:block;padding:10px;border-bottom:1px solid #ebdfe4}
-input{accent-color:#79516b}
+label{display:flex;align-items:center;gap:14px;padding:19px 18px;margin:10px 0;border:1px solid #eadce2;border-radius:17px;background:#fffdfb;min-height:76px;font-size:16px;font-weight:550;box-shadow:0 3px 12px #5b3b4b0a;cursor:pointer}
+input{accent-color:#79516b;width:25px;height:25px;flex-shrink:0}
 #details p{border-bottom:1px solid #eee2e7;padding:8px 0}
 .demo{color:#a47790;font-style:italic}
-#qrArea{display:none;margin-top:20px;padding:20px;background:white;border-radius:18px}
+#qrArea{display:none;margin-top:20px;padding:20px;background:white;border-radius:18px}#presets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}#presets button{margin:0;padding:17px 5px;font-size:15px}#showQr{position:fixed;z-index:10;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 36px),500px);margin:0;border-radius:19px;min-height:64px;box-shadow:0 9px 30px #533b4b55;background:#75465f}#download{width:100%;background:#eadce4;color:#533b4b}#qrArea{position:fixed;z-index:20;inset:0;margin:0;border-radius:0;background:#f8f3f1;overflow:auto;text-align:center;padding:75px 20px 30px}#qr{display:flex;justify-content:center;padding:22px;background:white;width:max-content;margin:20px auto;border-radius:20px}#shareLink{overflow-wrap:anywhere;font-size:12px;color:#876b7c}#closeQr{display:none;position:fixed;z-index:25;top:max(18px,env(safe-area-inset-top));right:20px;background:#eadce4;color:#533b4b}body.qr-open #closeQr{display:block}
 </style>
 </head>
 <body><main>
@@ -32,7 +32,7 @@ input{accent-color:#79516b}
 <div id="fields"></div>
 <button id="showQr">Present QR code</button>
 <button id="download">Save contact</button>
-<div id="qrArea"><h3>Scan to connect</h3><div id="qr"></div><p id="shareLink"></p></div>
+<button id="closeQr" aria-label="Close QR presentation">Close ✕</button><div id="qrArea"><small>READY TO CONNECT</small><h1>Erin Wood</h1><p>Scan to save my contact</p><div id="qr"></div><p id="shareLink"></p></div>
 <p><small>Public concept only. Personal information is fictional filler. Links are not securely access-controlled. No personal data is stored.</small></p>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -56,11 +56,12 @@ document.querySelectorAll("[data-field]").forEach(b=>b.onchange=()=>{b.checked?s
 }
 document.getElementById("showQr").onclick=()=>{
 const url=new URL(location.href);url.search="";url.searchParams.set("fields",[...selected].join(","));url.searchParams.set("expires",Date.now()+172800000);
-document.getElementById("qrArea").style.display="block";
+document.getElementById("qrArea").style.display="block";document.body.classList.add("qr-open");
 document.getElementById("qr").innerHTML="";
 if(window.QRCode)new QRCode(document.getElementById("qr"),{text:url.href,width:200,height:200});
 document.getElementById("shareLink").textContent=url.href;
 };
+document.getElementById("closeQr").onclick=()=>{document.getElementById("qrArea").style.display="none";document.body.classList.remove("qr-open")};
 document.getElementById("download").onclick=()=>{
 const rows=["BEGIN:VCARD","VERSION:3.0","FN:Erin Wood","N:Wood;Erin;;;","ORG:New Life Community Church"];
 if(selected.has("email"))rows.push("EMAIL;TYPE=WORK:erinw@nl-cc.org");
