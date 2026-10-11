@@ -27,7 +27,7 @@ input{accent-color:#79516b;width:25px;height:25px;flex-shrink:0}
 <div class="card"><div class="profile"><img class="avatar portrait" src="https://storage1.snappages.site/ZFQHMM/assets/images/22948274_656x680_500.png" alt="Erin Wood"><div><h1>Erin Wood</h1><p class="subtitle">Pastor of Spiritual Formation</p></div></div><p class="church">New Life Community Church</p></div>
 <h3 class="section-heading">What would you like to share?</h3>
 <div id="presets"></div>
-<div class="field-list" id="fields"></div><section class="manual-fields"><h3>Optional details</h3><p>Only added when entered manually.</p><label>Address <input id="manualAddress" type="text" placeholder="Enter address"></label><label>Birthday <input id="manualBirthday" type="date"></label></section>
+<div class="field-list" id="fields"></div>
 <button id="showQr">Present QR code</button>
 <button id="download" class="save-button">Save contact</button>
 <button id="closeQr" aria-label="Close QR presentation">Close ✕</button><div id="qrArea"><small>READY TO CONNECT</small><h1>Erin Wood</h1><p>Scan to save my contact</p><div id="qr"></div><p id="shareLink"></p></div>
@@ -40,7 +40,9 @@ const entries=[
 ["workPhone","Church phone","(562) 924-4466 ext. 212",false],
 ["site","Church website","nl-cc.org",false],
 ["personalPhone","Personal phone","(555) 010-2048",true],
-["personalEmail","Personal email","erin.demo@example.com",true]];
+["personalEmail","Personal email","erin.demo@example.com",true],
+["address","Home address","123 Example Lane, Sample City, CA 90000",true],
+["birthday","Birthday","January 1 (sample)",true]];
 const presets={Business:["email","workPhone","site"],Personal:["personalPhone","personalEmail"],Custom:["email","site","personalPhone"]};
 let selected=new Set(presets.Business),active="Business";
 function render(){
@@ -63,9 +65,8 @@ const rows=["BEGIN:VCARD","VERSION:3.0","FN:Erin Wood","N:Wood;Erin;;;","ORG:New
 if(selected.has("email"))rows.push("EMAIL;TYPE=WORK:erinw@nl-cc.org");
 if(selected.has("workPhone"))rows.push("TEL;TYPE=WORK:(562) 924-4466 ext. 212");
 if(selected.has("site"))rows.push("URL:https://nl-cc.org");
-const addr=document.getElementById("manualAddress").value.trim();const bday=document.getElementById("manualBirthday").value;
-if(addr)rows.push("ADR;TYPE=HOME:;;"+addr.replace(/[;,]/g," "));
-if(bday)rows.push("BDAY:"+bday.split("-").join(""));
+if(selected.has("address"))rows.push("ADR;TYPE=HOME:;;123 Example Lane;Sample City;CA;90000;USA");
+if(selected.has("birthday"))rows.push("BDAY:20000101");
 rows.push("END:VCARD");
 const a=document.createElement("a"),u=URL.createObjectURL(new Blob([rows.join("\r\n")],{type:"text/vcard"}));a.href=u;a.download="Erin-Wood-demo.vcf";a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);
 };
